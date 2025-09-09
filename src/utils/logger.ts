@@ -1,7 +1,28 @@
 import winston from 'winston';
 import { config } from '../config/env';
 
-const logFormat = winston.format.combine(
+// Log level emojis for development mode
+const logEmojis = {
+  error: '❌',
+  warn: '⚠️',
+  info: 'ℹ️',
+  debug: '🐛'
+};
+
+// Development format with colors and emojis
+const developmentFormat = winston.format.combine(
+  winston.format.timestamp({ format: 'HH:mm:ss' }),
+  winston.format.errors({ stack: true }),
+  winston.format.colorize(),
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    const emoji = logEmojis[level.replace(/\u001b\[[0-9;]*m/g, '') as keyof typeof logEmojis] || 'ℹ️';
+    const metaStr = Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : '';
+    return `${emoji} ${timestamp} [${level}]: ${message}${metaStr}`;
+  })
+);
+
+// Production format (clean, structured)
+const productionFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.errors({ stack: true }),
   winston.format.json()
@@ -9,18 +30,10 @@ const logFormat = winston.format.combine(
 
 export const logger = winston.createLogger({
   level: config.LOG_LEVEL,
-  format: logFormat,
+  format: config.NODE_ENV === 'development' ? developmentFormat : productionFormat,
   transports: [
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-        winston.format.printf(({ timestamp, level, message, ...meta }) => {
-          return `${timestamp} [${level}]: ${message} ${
-            Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''
-          }`;
-        })
-      )
+      format: config.NODE_ENV === 'development' ? developmentFormat : productionFormat
     })
   ]
 });
