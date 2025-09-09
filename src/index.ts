@@ -2,24 +2,103 @@ import Fastify from 'fastify';
 import { config } from './config/env';
 import { logger } from './utils/logger';
 import { HTTP_STATUS, MESSAGES } from './config/constants';
+import { errorHandler } from './middleware/errorHandler';
+import { authRoutes } from './routes/auth';
+import { postsRoutes } from './routes/posts';
 
 // Initialize Fastify instance
 const fastify = Fastify({
   logger: false, // Using Winston instead
 });
 
-// Health check route
-fastify.get('/health', async (request, reply) => {
-  return reply.status(HTTP_STATUS.OK).send({
-    status: 'OK',
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
+// Register plugins
+const registerPlugins = async () => {
+  // CORS
+  await fastify.register(import('@fastify/cors'), {
+    origin: true,
+    credentials: true,
   });
-});
+
+  // Helmet for security
+  await fastify.register(import('@fastify/helmet'), {
+    contentSecurityPolicy: false,
+  });
+
+  // Compression
+  await fastify.register(import('@fastify/compress'));
+
+  // Rate limiting
+  await fastify.register(import('@fastify/rate-limit'), {
+    max: 100,
+    timeWindow: '15 minutes',
+  });
+
+  // JWT
+  await fastify.register(import('@fastify/jwt'), {
+    secret: config.JWT_SECRET,
+  });
+
+  // Swagger
+  await fastify.register(import('@fastify/swagger'), {
+    swagger: {
+      info: {
+        title: 'Backend API Server',
+        description: 'Comprehensive backend API with authentication and CRUD operations',
+        version: '1.0.0',
+      },
+      host: `${config.HOST}:${config.PORT}`,
+      schemes: ['http', 'https'],
+      consumes: ['application/json'],
+      produces: ['application/json'],
+      securityDefinitions: {
+        bearerAuth: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header',
+          description: 'Enter: Bearer <token>',
+        },
+      },
+    },
+  });
+
+  await fastify.register(import('@fastify/swagger-ui'), {
+    routePrefix: '/docs',
+    uiConfig: {
+      docExpansion: 'list',
+      deepLinking: false,
+    },
+  });
+};
+
+// Register routes
+const registerRoutes = async () => {
+  // Health check route
+  fastify.get('/health', async (request, reply) => {
+    return reply.status(HTTP_STATUS.OK).send({
+      status: 'OK',
+      message: 'Server is running',
+      timestamp: new Date().toISOString(),
+      environment: config.NODE_ENV,
+    });
+  });
+
+  // API routes
+  await fastify.register(authRoutes, { prefix: '/api/auth' });
+  await fastify.register(postsRoutes, { prefix: '/api/posts' });
+};
+
+// Error handler
+fastify.setErrorHandler(errorHandler);
 
 // Start server
 const start = async () => {
   try {
+    // Register plugins first
+    await registerPlugins();
+    
+    // Register routes
+    await registerRoutes();
+    
     const port = config.PORT;
     const host = config.HOST;
     
@@ -28,6 +107,7 @@ const start = async () => {
       host,
       listenTextResolver: (address) => {
         logger.info(`Server listening on ${address}`);
+        logger.info(`📚 API Documentation available at: ${address}/docs`);
         return `Server ready on ${address}`;
       }
     });
