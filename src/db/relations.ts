@@ -1,80 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { color, potVariants, sizeMaterialOption, potCategory, potSizeProfile, potMaterial, user, role, roleCreationAuditLog, action, module, resource, permission, rolePermissionAuditLog, userPermissionAuditLog, group, groupPermission, groupPermissionAuditLog, customer, admin, superAdmin, employee, warehouse, warehouseEmployee, supplier, nurseryMediaAsset, customerSessions, notifyMeSubscription, plants, plantVariants, plantSizeProfile, customerAddress, plantCartItem, promoCode, potCartItem, plantCheckoutLater, potCheckoutLater, potVariantImage, plantVariantImage, plantCareGuidelines, sunlightTypes, humidityLevel, plantFertilizerSchedule, fertilizers, plantGenericCostComponent, plantSizeCostComponent, potGenericCostComponent, potSizeCostComponent, tagGroups, tags, order, plantOrderItem, potOrderItem, payment, orderCostDetails, shipping, returnsRefunds, promotion, promotionProduct, referralCode, referralUsage, plantStockAuditLog, potStockAuditLog, plantDamagedProduct, purchaseOrder, purchaseOrderItems, potDamagedProduct, review, reviewImage, websiteAnalytics, plantSalesAnalytics, potSalesAnalytics, plantWarehouseInventory, potWarehouseInventory, plantRestockEventLog, potRestockEventLog, warehouseCartItem, purchaseOrderPayment, purchaseOrderMedia, plantSupplierInventory, potSupplierInventory, emailVerification, phoneVerification, notification, plantCategory, productCategories, compatiblePots, plantVariantToTags, potVariantToTags, rolePermission, userGroup, groupRole, userPermission } from "./schema";
-
-export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
-	color: one(color, {
-		fields: [potVariants.colorId],
-		references: [color.id]
-	}),
-	sizeMaterialOption: one(sizeMaterialOption, {
-		fields: [potVariants.sizeMaterialOptionId],
-		references: [sizeMaterialOption.sizeMaterialOptionId]
-	}),
-	notifyMeSubscriptions: many(notifyMeSubscription),
-	potCartItems: many(potCartItem),
-	potCheckoutLaters: many(potCheckoutLater),
-	potVariantImages: many(potVariantImage),
-	potOrderItems: many(potOrderItem),
-	promotionProducts: many(promotionProduct),
-	potStockAuditLogs: many(potStockAuditLog),
-	purchaseOrderItems: many(purchaseOrderItems),
-	potDamagedProducts: many(potDamagedProduct),
-	reviews: many(review),
-	potSalesAnalytics: many(potSalesAnalytics),
-	potWarehouseInventories: many(potWarehouseInventory),
-	potRestockEventLogs: many(potRestockEventLog),
-	warehouseCartItems: many(warehouseCartItem),
-	potSupplierInventories: many(potSupplierInventory),
-	compatiblePots: many(compatiblePots),
-	potVariantToTags: many(potVariantToTags),
-}));
-
-export const colorRelations = relations(color, ({many}) => ({
-	potVariants: many(potVariants),
-	plantVariants: many(plantVariants),
-}));
-
-export const sizeMaterialOptionRelations = relations(sizeMaterialOption, ({one, many}) => ({
-	potVariants: many(potVariants),
-	potSizeProfile: one(potSizeProfile, {
-		fields: [sizeMaterialOption.potSizeProfileId],
-		references: [potSizeProfile.potSizeProfileId]
-	}),
-	potMaterial: one(potMaterial, {
-		fields: [sizeMaterialOption.materialId],
-		references: [potMaterial.materialId]
-	}),
-}));
-
-export const potSizeProfileRelations = relations(potSizeProfile, ({one, many}) => ({
-	potCategory: one(potCategory, {
-		fields: [potSizeProfile.categoryId],
-		references: [potCategory.categoryId]
-	}),
-	sizeMaterialOptions: many(sizeMaterialOption),
-}));
-
-export const potCategoryRelations = relations(potCategory, ({many}) => ({
-	potSizeProfiles: many(potSizeProfile),
-	notifyMeSubscriptions: many(notifyMeSubscription),
-	potCartItems: many(potCartItem),
-	potCheckoutLaters: many(potCheckoutLater),
-	potOrderItems: many(potOrderItem),
-	promotionProducts: many(promotionProduct),
-	potStockAuditLogs: many(potStockAuditLog),
-	purchaseOrderItems: many(purchaseOrderItems),
-	potDamagedProducts: many(potDamagedProduct),
-	reviews: many(review),
-	potSalesAnalytics: many(potSalesAnalytics),
-	potWarehouseInventories: many(potWarehouseInventory),
-	potRestockEventLogs: many(potRestockEventLog),
-	warehouseCartItems: many(warehouseCartItem),
-	potSupplierInventories: many(potSupplierInventory),
-}));
-
-export const potMaterialRelations = relations(potMaterial, ({many}) => ({
-	sizeMaterialOptions: many(sizeMaterialOption),
-}));
+import { user, role, roleCreationAuditLog, action, module, resource, permission, rolePermissionAuditLog, userPermissionAuditLog, group, groupPermission, groupPermissionAuditLog, customer, admin, superAdmin, employee, warehouse, warehouseEmployee, supplier, nurseryMediaAsset, customerSessions, notifyMeSubscription, plants, plantVariants, potCategory, potVariants, color, plantSizeProfile, customerAddress, plantCartItem, promoCode, potCartItem, plantCheckoutLater, potCheckoutLater, potVariantImage, plantVariantImage, plantCareGuidelines, sunlightTypes, humidityLevel, plantFertilizerSchedule, fertilizers, plantGenericCostComponent, plantSizeCostComponent, potGenericCostComponent, potSizeCostComponent, tagGroups, tags, order, plantOrderItem, potOrderItem, payment, orderCostDetails, shipping, returnsRefunds, promotion, promotionProduct, referralCode, referralUsage, plantStockAuditLog, potStockAuditLog, plantDamagedProduct, purchaseOrder, purchaseOrderItems, potDamagedProduct, review, reviewImage, websiteAnalytics, plantSalesAnalytics, potSalesAnalytics, plantWarehouseInventory, potWarehouseInventory, plantRestockEventLog, potRestockEventLog, warehouseCartItem, purchaseOrderPayment, purchaseOrderMedia, plantSupplierInventory, potSupplierInventory, emailVerification, phoneVerification, notification, sizeMaterialOption, potSizeProfile, potMaterial, plantCategory, productCategories, compatiblePots, plantVariantToTags, potVariantToTags, rolePermission, userGroup, groupRole, userPermission } from "./schema";
 
 export const roleRelations = relations(role, ({one, many}) => ({
 	user: one(user, {
@@ -464,6 +389,57 @@ export const plantVariantsRelations = relations(plantVariants, ({one, many}) => 
 	warehouseCartItems: many(warehouseCartItem),
 	plantSupplierInventories: many(plantSupplierInventory),
 	plantVariantToTags: many(plantVariantToTags),
+}));
+
+export const potCategoryRelations = relations(potCategory, ({many}) => ({
+	notifyMeSubscriptions: many(notifyMeSubscription),
+	potCartItems: many(potCartItem),
+	potCheckoutLaters: many(potCheckoutLater),
+	potOrderItems: many(potOrderItem),
+	promotionProducts: many(promotionProduct),
+	potStockAuditLogs: many(potStockAuditLog),
+	purchaseOrderItems: many(purchaseOrderItems),
+	potDamagedProducts: many(potDamagedProduct),
+	reviews: many(review),
+	potSalesAnalytics: many(potSalesAnalytics),
+	potWarehouseInventories: many(potWarehouseInventory),
+	potRestockEventLogs: many(potRestockEventLog),
+	warehouseCartItems: many(warehouseCartItem),
+	potSupplierInventories: many(potSupplierInventory),
+	potSizeProfiles: many(potSizeProfile),
+}));
+
+export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
+	notifyMeSubscriptions: many(notifyMeSubscription),
+	potCartItems: many(potCartItem),
+	potCheckoutLaters: many(potCheckoutLater),
+	potVariantImages: many(potVariantImage),
+	potOrderItems: many(potOrderItem),
+	promotionProducts: many(promotionProduct),
+	potStockAuditLogs: many(potStockAuditLog),
+	purchaseOrderItems: many(purchaseOrderItems),
+	potDamagedProducts: many(potDamagedProduct),
+	reviews: many(review),
+	potSalesAnalytics: many(potSalesAnalytics),
+	potWarehouseInventories: many(potWarehouseInventory),
+	potRestockEventLogs: many(potRestockEventLog),
+	warehouseCartItems: many(warehouseCartItem),
+	potSupplierInventories: many(potSupplierInventory),
+	color: one(color, {
+		fields: [potVariants.colorId],
+		references: [color.id]
+	}),
+	sizeMaterialOption: one(sizeMaterialOption, {
+		fields: [potVariants.sizeMaterialOptionId],
+		references: [sizeMaterialOption.sizeMaterialOptionId]
+	}),
+	compatiblePots: many(compatiblePots),
+	potVariantToTags: many(potVariantToTags),
+}));
+
+export const colorRelations = relations(color, ({many}) => ({
+	plantVariants: many(plantVariants),
+	potVariants: many(potVariants),
 }));
 
 export const plantSizeProfileRelations = relations(plantSizeProfile, ({one, many}) => ({
@@ -1175,6 +1151,30 @@ export const notificationRelations = relations(notification, ({one}) => ({
 		fields: [notification.userId],
 		references: [user.userId]
 	}),
+}));
+
+export const sizeMaterialOptionRelations = relations(sizeMaterialOption, ({one, many}) => ({
+	potVariants: many(potVariants),
+	potSizeProfile: one(potSizeProfile, {
+		fields: [sizeMaterialOption.potSizeProfileId],
+		references: [potSizeProfile.potSizeProfileId]
+	}),
+	potMaterial: one(potMaterial, {
+		fields: [sizeMaterialOption.materialId],
+		references: [potMaterial.materialId]
+	}),
+}));
+
+export const potSizeProfileRelations = relations(potSizeProfile, ({one, many}) => ({
+	potCategory: one(potCategory, {
+		fields: [potSizeProfile.categoryId],
+		references: [potCategory.categoryId]
+	}),
+	sizeMaterialOptions: many(sizeMaterialOption),
+}));
+
+export const potMaterialRelations = relations(potMaterial, ({many}) => ({
+	sizeMaterialOptions: many(sizeMaterialOption),
 }));
 
 export const productCategoriesRelations = relations(productCategories, ({one}) => ({

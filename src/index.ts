@@ -1,4 +1,4 @@
-import Fastify, { fastify } from 'fastify';
+import Fastify from 'fastify';
 import { config } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import { responseFormatter } from './middleware/responseFormatter';
@@ -82,6 +82,7 @@ const registerRoutes = async () => {
 
   // API routes
   await fastify.register(authRoutes, { prefix: '/api/auth' });
+  // await fastify.register(postsRoutes, { prefix: '/api/posts' });
 };
 
 // Error handler
