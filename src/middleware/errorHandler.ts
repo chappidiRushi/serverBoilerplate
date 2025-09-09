@@ -24,9 +24,9 @@ export const errorHandler = (
     return reply.status(HTTP_STATUS.BAD_REQUEST).send({
       error: MESSAGES.ERROR.VALIDATION,
       message: 'Validation failed',
-      details: error.errors.map(err => ({
-        path: err.path.join('.'),
-        message: err.message,
+      details: error.issues.map((issue: any) => ({
+        path: issue.path.join('.'),
+        message: issue.message,
       })),
     });
   }

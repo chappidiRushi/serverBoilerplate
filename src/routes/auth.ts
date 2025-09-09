@@ -1,11 +1,11 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { register, login, getProfile } from '../controllers/authController';
 import { authenticate } from '../middleware/auth';
 import { RegisterSchema, LoginSchema } from '../schemas/auth';
 
 export async function authRoutes(fastify: FastifyInstance) {
   // Validation middleware
-  const validateRegister = async (request: any, reply: any) => {
+  const validateRegister = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       request.body = RegisterSchema.parse(request.body);
     } catch (error) {
@@ -13,7 +13,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   };
 
-  const validateLogin = async (request: any, reply: any) => {
+  const validateLogin = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       request.body = LoginSchema.parse(request.body);
     } catch (error) {

@@ -48,6 +48,9 @@ export const register = async (
       });
 
     // Generate JWT
+    if (!newUser) {
+      throw new Error('Failed to create user');
+    }
     const payload = generateJWTPayload(newUser);
     const token = await reply.jwtSign(payload, { expiresIn: JWT.EXPIRES_IN });
 

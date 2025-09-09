@@ -9,7 +9,7 @@ export interface AuthenticatedUser {
 }
 
 declare module 'fastify' {
-  interface FastifyRequest {
+  export interface FastifyRequest {
     user?: AuthenticatedUser;
   }
 }

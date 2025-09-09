@@ -1,11 +1,11 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { createPost, getPosts, getPost, updatePost, deletePost } from '../controllers/postsController';
 import { authenticate, optionalAuth } from '../middleware/auth';
 import { CreatePostSchema, UpdatePostSchema, PostParamsSchema, PostQuerySchema } from '../schemas/posts';
 
 export async function postsRoutes(fastify: FastifyInstance) {
   // Validation middleware
-  const validateCreatePost = async (request: any, reply: any) => {
+  const validateCreatePost = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       request.body = CreatePostSchema.parse(request.body);
     } catch (error) {
@@ -13,7 +13,7 @@ export async function postsRoutes(fastify: FastifyInstance) {
     }
   };
 
-  const validateUpdatePost = async (request: any, reply: any) => {
+  const validateUpdatePost = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       request.body = UpdatePostSchema.parse(request.body);
     } catch (error) {
@@ -21,7 +21,7 @@ export async function postsRoutes(fastify: FastifyInstance) {
     }
   };
 
-  const validatePostParams = async (request: any, reply: any) => {
+  const validatePostParams = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       request.params = PostParamsSchema.parse(request.params);
     } catch (error) {
@@ -29,7 +29,7 @@ export async function postsRoutes(fastify: FastifyInstance) {
     }
   };
 
-  const validatePostQuery = async (request: any, reply: any) => {
+  const validatePostQuery = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       request.query = PostQuerySchema.parse(request.query);
     } catch (error) {

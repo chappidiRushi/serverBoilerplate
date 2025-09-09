@@ -71,10 +71,12 @@ export const getPosts = async (
       .offset(offset);
 
     // Get total count
-    const [{ total }] = await db
+    const totalResult = await db
       .select({ total: count() })
       .from(posts)
       .where(whereClause);
+    
+    const total = totalResult[0]?.total || 0;
 
     return reply.status(HTTP_STATUS.OK).send({
       message: MESSAGES.SUCCESS.FETCHED,
