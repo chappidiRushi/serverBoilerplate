@@ -1,8 +1,9 @@
 import Fastify from 'fastify';
 import { config } from './config/env';
 import { logger } from './utils/logger';
-import { HTTP_STATUS, MESSAGES } from './config/constants';
+import { HTTP_STATUS } from './config/constants';
 import { errorHandler } from './middleware/errorHandler';
+import { responseFormatter } from './middleware/responseFormatter';
 import { authRoutes } from './routes/auth';
 import { postsRoutes } from './routes/posts';
 
@@ -74,12 +75,11 @@ const registerPlugins = async () => {
 const registerRoutes = async () => {
   // Health check route
   fastify.get('/health', async (request, reply) => {
-    return reply.status(HTTP_STATUS.OK).send({
+    return reply.success({
       status: 'OK',
-      message: 'Server is running',
-      timestamp: new Date().toISOString(),
       environment: config.NODE_ENV,
-    });
+      uptime: process.uptime(),
+    }, 'Server is running');
   });
 
   // API routes
@@ -93,7 +93,10 @@ fastify.setErrorHandler(errorHandler);
 // Start server
 const start = async () => {
   try {
-    // Register plugins first
+    // Register response formatter middleware first
+    fastify.addHook('onRequest', responseFormatter);
+    
+    // Register plugins
     await registerPlugins();
     
     // Register routes

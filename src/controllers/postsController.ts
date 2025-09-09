@@ -2,8 +2,8 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { eq, and, desc, count } from 'drizzle-orm';
 import { db } from '../db/connection';
 import { posts, users } from '../db/schema';
-import { HTTP_STATUS, MESSAGES } from '../config/constants';
 import type { CreatePostInput, UpdatePostInput, PostParams, PostQuery } from '../schemas/posts';
+import { NotFoundError, AuthorizationError } from '../types/errors';
 
 export const createPost = async (
   request: FastifyRequest<{ Body: CreatePostInput }>,
@@ -12,24 +12,17 @@ export const createPost = async (
   const { title, content, isPublished } = request.body;
   const userId = request.user!.id;
 
-  try {
-    const [newPost] = await db
-      .insert(posts)
-      .values({
-        title,
-        content,
-        isPublished,
-        userId,
-      })
-      .returning();
+  const [newPost] = await db
+    .insert(posts)
+    .values({
+      title,
+      content,
+      isPublished,
+      userId,
+    })
+    .returning();
 
-    return reply.status(HTTP_STATUS.CREATED).send({
-      message: MESSAGES.SUCCESS.CREATED,
-      data: { post: newPost }
-    });
-  } catch (error) {
-    throw error;
-  }
+  return reply.success({ post: newPost }, 'Post created successfully', 201);
 };
 
 export const getPosts = async (
@@ -39,60 +32,50 @@ export const getPosts = async (
   const { page = 1, limit = 10, userId: filterUserId, isPublished } = request.query;
   const offset = (page - 1) * limit;
 
-  try {
-    // Build where conditions
-    const conditions = [];
-    if (filterUserId) conditions.push(eq(posts.userId, filterUserId));
-    if (isPublished !== undefined) conditions.push(eq(posts.isPublished, isPublished));
+  // Build where conditions
+  const conditions = [];
+  if (filterUserId) conditions.push(eq(posts.userId, filterUserId));
+  if (isPublished !== undefined) conditions.push(eq(posts.isPublished, isPublished));
 
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    // Get posts with user info
-    const postsData = await db
-      .select({
-        id: posts.id,
-        title: posts.title,
-        content: posts.content,
-        isPublished: posts.isPublished,
-        createdAt: posts.createdAt,
-        updatedAt: posts.updatedAt,
-        user: {
-          id: users.id,
-          email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
-        }
-      })
-      .from(posts)
-      .leftJoin(users, eq(posts.userId, users.id))
-      .where(whereClause)
-      .orderBy(desc(posts.createdAt))
-      .limit(limit)
-      .offset(offset);
-
-    // Get total count
-    const totalResult = await db
-      .select({ total: count() })
-      .from(posts)
-      .where(whereClause);
-    
-    const total = totalResult[0]?.total || 0;
-
-    return reply.status(HTTP_STATUS.OK).send({
-      message: MESSAGES.SUCCESS.FETCHED,
-      data: {
-        posts: postsData,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        }
+  // Get posts with user info
+  const postsData = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      content: posts.content,
+      isPublished: posts.isPublished,
+      createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt,
+      user: {
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
       }
-    });
-  } catch (error) {
-    throw error;
-  }
+    })
+    .from(posts)
+    .leftJoin(users, eq(posts.userId, users.id))
+    .where(whereClause)
+    .orderBy(desc(posts.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  // Get total count
+  const totalResult = await db
+    .select({ total: count() })
+    .from(posts)
+    .where(whereClause);
+  
+  const total = totalResult[0]?.total || 0;
+
+  return reply.paginated(postsData, {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+  });
 };
 
 export const getPost = async (
@@ -101,41 +84,31 @@ export const getPost = async (
 ) => {
   const { id } = request.params;
 
-  try {
-    const [post] = await db
-      .select({
-        id: posts.id,
-        title: posts.title,
-        content: posts.content,
-        isPublished: posts.isPublished,
-        createdAt: posts.createdAt,
-        updatedAt: posts.updatedAt,
-        user: {
-          id: users.id,
-          email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
-        }
-      })
-      .from(posts)
-      .leftJoin(users, eq(posts.userId, users.id))
-      .where(eq(posts.id, id))
-      .limit(1);
+  const [post] = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      content: posts.content,
+      isPublished: posts.isPublished,
+      createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt,
+      user: {
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      }
+    })
+    .from(posts)
+    .leftJoin(users, eq(posts.userId, users.id))
+    .where(eq(posts.id, id))
+    .limit(1);
 
-    if (!post) {
-      return reply.status(HTTP_STATUS.NOT_FOUND).send({
-        error: MESSAGES.ERROR.NOT_FOUND,
-        message: 'Post not found'
-      });
-    }
-
-    return reply.status(HTTP_STATUS.OK).send({
-      message: MESSAGES.SUCCESS.FETCHED,
-      data: { post }
-    });
-  } catch (error) {
-    throw error;
+  if (!post) {
+    throw new NotFoundError('Post not found');
   }
+
+  return reply.success({ post }, 'Post retrieved successfully');
 };
 
 export const updatePost = async (
@@ -146,35 +119,25 @@ export const updatePost = async (
   const updates = request.body;
   const userId = request.user!.id;
 
-  try {
-    // Check if post exists and belongs to user
-    const [existingPost] = await db
-      .select()
-      .from(posts)
-      .where(and(eq(posts.id, id), eq(posts.userId, userId)))
-      .limit(1);
+  // Check if post exists and belongs to user
+  const [existingPost] = await db
+    .select()
+    .from(posts)
+    .where(and(eq(posts.id, id), eq(posts.userId, userId)))
+    .limit(1);
 
-    if (!existingPost) {
-      return reply.status(HTTP_STATUS.NOT_FOUND).send({
-        error: MESSAGES.ERROR.NOT_FOUND,
-        message: 'Post not found or you do not have permission to update it'
-      });
-    }
-
-    // Update post
-    const [updatedPost] = await db
-      .update(posts)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(posts.id, id))
-      .returning();
-
-    return reply.status(HTTP_STATUS.OK).send({
-      message: MESSAGES.SUCCESS.UPDATED,
-      data: { post: updatedPost }
-    });
-  } catch (error) {
-    throw error;
+  if (!existingPost) {
+    throw new NotFoundError('Post not found or you do not have permission to update it');
   }
+
+  // Update post
+  const [updatedPost] = await db
+    .update(posts)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(posts.id, id))
+    .returning();
+
+  return reply.success({ post: updatedPost }, 'Post updated successfully');
 };
 
 export const deletePost = async (
@@ -184,26 +147,19 @@ export const deletePost = async (
   const { id } = request.params;
   const userId = request.user!.id;
 
-  try {
-    // Check if post exists and belongs to user
-    const [existingPost] = await db
-      .select()
-      .from(posts)
-      .where(and(eq(posts.id, id), eq(posts.userId, userId)))
-      .limit(1);
+  // Check if post exists and belongs to user
+  const [existingPost] = await db
+    .select()
+    .from(posts)
+    .where(and(eq(posts.id, id), eq(posts.userId, userId)))
+    .limit(1);
 
-    if (!existingPost) {
-      return reply.status(HTTP_STATUS.NOT_FOUND).send({
-        error: MESSAGES.ERROR.NOT_FOUND,
-        message: 'Post not found or you do not have permission to delete it'
-      });
-    }
-
-    // Delete post
-    await db.delete(posts).where(eq(posts.id, id));
-
-    return reply.status(HTTP_STATUS.NO_CONTENT).send();
-  } catch (error) {
-    throw error;
+  if (!existingPost) {
+    throw new NotFoundError('Post not found or you do not have permission to delete it');
   }
+
+  // Delete post
+  await db.delete(posts).where(eq(posts.id, id));
+
+  return reply.success(null, 'Post deleted successfully', 204);
 };

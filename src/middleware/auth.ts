@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { HTTP_STATUS, MESSAGES } from '../config/constants';
+import { AuthenticationError } from '../types/errors';
 
 export interface AuthenticatedUser {
   id: number;
@@ -9,29 +9,24 @@ export interface AuthenticatedUser {
 }
 
 declare module 'fastify' {
-  export interface FastifyRequest {
+  interface FastifyRequest {
     user?: AuthenticatedUser;
+    requestId?: string;
   }
 }
 
 export const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
-  try {
-    const token = request.headers.authorization?.replace('Bearer ', '');
-    
-    if (!token) {
-      return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
-        error: MESSAGES.ERROR.UNAUTHORIZED,
-        message: 'No token provided'
-      });
-    }
+  const token = request.headers.authorization?.replace('Bearer ', '');
+  
+  if (!token) {
+    throw new AuthenticationError('No token provided');
+  }
 
+  try {
     const decoded = await request.server.jwt.verify(token) as AuthenticatedUser;
     request.user = decoded;
   } catch (err) {
-    return reply.status(HTTP_STATUS.UNAUTHORIZED).send({
-      error: MESSAGES.ERROR.INVALID_TOKEN,
-      message: 'Invalid or expired token'
-    });
+    throw new AuthenticationError('Invalid or expired token');
   }
 };
 
