@@ -1,12 +1,12 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
 import { eq } from 'drizzle-orm';
-import { db } from '../db/connection';
-import { users } from '../db/schema';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { JWT } from '../config/constants';
-import { hashPassword, comparePassword, generateJWTPayload } from '../utils/auth';
+import { db } from '../db/connection';
+import { user } from '../db/schema';
+import type { LoginInput, RegisterInput } from '../schemas/auth';
+import { AuthenticationError, ConflictError, NotFoundError } from '../types/errors';
+import { comparePassword, generateJWTPayload, hashPassword } from '../utils/auth';
 import { sanitizeUser } from '../utils/helpers';
-import type { RegisterInput, LoginInput } from '../schemas/auth';
-import { ConflictError, AuthenticationError, NotFoundError } from '../types/errors';
 
 export const register = async (
   request: FastifyRequest<{ Body: RegisterInput }>,
@@ -17,8 +17,8 @@ export const register = async (
   // Check if user already exists
   const existingUser = await db
     .select()
-    .from(users)
-    .where(eq(users.email, email))
+    .from(user)
+    .where(eq(user.email, email))
     .limit(1);
 
   if (existingUser.length > 0) {
@@ -30,7 +30,7 @@ export const register = async (
 
   // Create user
   const [newUser] = await db
-    .insert(users)
+    .insert(user)
     .values({
       email,
       password: hashedPassword,
@@ -38,11 +38,11 @@ export const register = async (
       lastName,
     })
     .returning({
-      id: users.id,
-      email: users.email,
-      firstName: users.firstName,
-      lastName: users.lastName,
-      createdAt: users.createdAt,
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      createdAt: user.createdAt,
     });
 
   if (!newUser) {
@@ -66,19 +66,19 @@ export const login = async (
   const { email, password } = request.body;
 
   // Find user
-  const [user] = await db
+  const [user1] = await db
     .select()
-    .from(users)
-    .where(eq(users.email, email))
+    .from(user)
+    .where(eq(user.email, email))
     .limit(1);
 
-  if (!user) {
+  if (!user1) {
     throw new AuthenticationError('Invalid email or password');
   }
 
   // Verify password
   const isValidPassword = await comparePassword(password, user.password);
-  
+
   if (!isValidPassword) {
     throw new AuthenticationError('Invalid email or password');
   }
@@ -96,21 +96,21 @@ export const login = async (
 export const getProfile = async (request: FastifyRequest, reply: FastifyReply) => {
   const userId = request.user!.id;
 
-  const [user] = await db
+  const [user1] = await db
     .select({
-      id: users.id,
-      email: users.email,
-      firstName: users.firstName,
-      lastName: users.lastName,
-      isActive: users.isActive,
-      createdAt: users.createdAt,
-      updatedAt: users.updatedAt,
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     })
-    .from(users)
-    .where(eq(users.id, userId))
+    .from(user)
+    .where(eq(user.id, userId))
     .limit(1);
 
-  if (!user) {
+  if (!user1) {
     throw new NotFoundError('User not found');
   }
 

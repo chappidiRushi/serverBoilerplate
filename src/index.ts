@@ -1,11 +1,9 @@
-import Fastify from 'fastify';
+import Fastify, { fastify } from 'fastify';
 import { config } from './config/env';
-import { logger } from './utils/logger';
-import { HTTP_STATUS } from './config/constants';
 import { errorHandler } from './middleware/errorHandler';
 import { responseFormatter } from './middleware/responseFormatter';
 import { authRoutes } from './routes/auth';
-import { postsRoutes } from './routes/posts';
+import { logger } from './utils/logger';
 
 // Initialize Fastify instance
 const fastify = Fastify({
@@ -84,7 +82,6 @@ const registerRoutes = async () => {
 
   // API routes
   await fastify.register(authRoutes, { prefix: '/api/auth' });
-  await fastify.register(postsRoutes, { prefix: '/api/posts' });
 };
 
 // Error handler
@@ -95,18 +92,18 @@ const start = async () => {
   try {
     // Register response formatter middleware first
     fastify.addHook('onRequest', responseFormatter);
-    
+
     // Register plugins
     await registerPlugins();
-    
+
     // Register routes
     await registerRoutes();
-    
+
     const port = config.PORT;
     const host = config.HOST;
-    
-    await fastify.listen({ 
-      port, 
+
+    await fastify.listen({
+      port,
       host,
       listenTextResolver: (address) => {
         logger.info(`Server listening on ${address}`);
@@ -114,7 +111,7 @@ const start = async () => {
         return `Server ready on ${address}`;
       }
     });
-    
+
     logger.info(`🚀 Server started successfully on ${host}:${port}`);
   } catch (err) {
     logger.error('Failed to start server:', err);
