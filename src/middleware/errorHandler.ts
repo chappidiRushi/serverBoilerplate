@@ -13,15 +13,19 @@ export const errorHandler = (
 ) => {
   const requestId = (request as any).requestId || 'unknown';
 
-  // Log the error with request context
+  // Extract source location for custom errors
+  const sourceLocation = error instanceof AppError ? error.sourceLocation : undefined;
+  
+  // Log the error with request context and source location
   logger.error('Request error:', {
     requestId,
     error: error.message,
+    code: error.code || 'UNKNOWN_ERROR',
+    sourceLocation: sourceLocation ? `${sourceLocation.file}:${sourceLocation.line}` : undefined,
     stack: config.NODE_ENV === 'development' ? error.stack : undefined,
     url: request.url,
     method: request.method,
     statusCode: error.statusCode,
-    code: error.code,
     params: request.params,
     query: request.query,
     body: request.body,
