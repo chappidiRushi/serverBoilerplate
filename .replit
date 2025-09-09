@@ -1,0 +1,3 @@
+modules = ["bun-1.2", "postgresql-17"]
+[agent]
+expertMode = true
