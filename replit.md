@@ -101,7 +101,7 @@ Preferred communication style: Simple, everyday language.
 ## Getting Started
 
 ### 1. Environment Setup
-The server is already configured and running. Environment variables are automatically provided by Replit.
+The server is already configured and running. Environment variables are automatically provided by 
 
 ### 2. API Documentation
 Visit `http://localhost:3000/docs` to view the interactive API documentation with Swagger UI.

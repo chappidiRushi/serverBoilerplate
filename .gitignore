@@ -71,3 +71,4 @@ drizzle/
 # Backup files
 *.bak
 *.backup
+.local/
