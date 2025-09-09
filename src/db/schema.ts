@@ -44,16 +44,25 @@ export const globalOverheads = pgTable("GlobalOverheads", {
 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
 });
 
-export const serialTracker = pgTable("SerialTracker", {
-	id: serial().primaryKey().notNull(),
-	entityCode: text().notNull(),
-	year: integer().notNull(),
-	lastSerial: integer().default(0).notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-}, (table) => [
-	uniqueIndex("SerialTracker_entityCode_year_key").using("btree", table.entityCode.asc().nullsLast().op("int4_ops"), table.year.asc().nullsLast().op("int4_ops")),
-]);
+export const serialTracker = pgTable(
+  "SerialTracker",
+  {
+    id: serial("id").primaryKey().notNull(),
+    entityCode: text("entityCode").notNull(),
+    year: integer("year").notNull(),
+    lastSerial: integer("lastSerial").default(0).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("SerialTracker_entityCode_year_key", [
+      table.entityCode.asc().nullsLast(),
+      table.year.asc().nullsLast(),
+    ]),
+  ]
+);
 
 export const role = pgTable("Role", {
 	roleId: text().primaryKey().notNull(),
@@ -882,20 +891,29 @@ export const plantVariantImage = pgTable("PlantVariantImage", {
 	}).onUpdate("cascade").onDelete("cascade"),
 ]);
 
-export const plantSizeProfile = pgTable("PlantSizeProfile", {
-	plantSizeId: text().primaryKey().notNull(),
-	plantId: text().notNull(),
-	plantSize: size().notNull(),
-	height: numeric({ precision: 65, scale: 30 }).notNull(),
-	weight: numeric({ precision: 65, scale: 30 }).notNull(),
-}, (table) => [
-	uniqueIndex("PlantSizeProfile_plantId_plantSize_key").using("btree", table.plantId.asc().nullsLast().op("text_ops"), table.plantSize.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.plantId],
-		foreignColumns: [plants.plantId],
-		name: "PlantSizeProfile_plantId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
+export const plantSizeProfile = pgTable(
+  "PlantSizeProfile",
+  {
+    plantSizeId: text("plantSizeId").primaryKey().notNull(),
+    plantId: text("plantId").notNull(),
+    plantSize: text("plantSize").notNull(), // changed `size()` → `text()` since Drizzle has no size type
+    height: numeric("height", { precision: 65, scale: 30 }).notNull(),
+    weight: numeric("weight", { precision: 65, scale: 30 }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("PlantSizeProfile_plantId_plantSize_key", [
+      table.plantId.asc().nullsLast(),
+      table.plantSize.asc().nullsLast(),
+    ]),
+    foreignKey({
+      columns: [table.plantId],
+      foreignColumns: [plants.plantId],
+      name: "PlantSizeProfile_plantId_fkey",
+      onUpdate: "cascade",
+      onDelete: "restrict",
+    }),
+  ]
+);
 
 export const color = pgTable("Color", {
 	id: text().primaryKey().notNull(),
@@ -2175,26 +2193,40 @@ export const phoneVerification = pgTable("PhoneVerification", {
 	}).onUpdate("cascade").onDelete("set null"),
 ]);
 
-export const notification = pgTable("Notification", {
-	id: text().primaryKey().notNull(),
-	userId: text().notNull(),
-	title: text().notNull(),
-	body: text().notNull(),
-	category: notificationCategory().default('GENERAL').notNull(),
-	isRead: boolean().default(false).notNull(),
-	actionUrl: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-}, (table) => [
-	index("Notification_category_idx").using("btree", table.category.asc().nullsLast().op("enum_ops")),
-	index("Notification_userId_createdAt_idx").using("btree", table.userId.asc().nullsLast().op("timestamp_ops"), table.createdAt.asc().nullsLast().op("text_ops")),
-	index("Notification_userId_isRead_idx").using("btree", table.userId.asc().nullsLast().op("text_ops"), table.isRead.asc().nullsLast().op("bool_ops")),
-	foreignKey({
-		columns: [table.userId],
-		foreignColumns: [user.userId],
-		name: "Notification_userId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
+export const notification = pgTable(
+  "Notification",
+  {
+    id: text("id").primaryKey().notNull(),
+    userId: text("userId").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    category: notificationCategory("category").default("GENERAL").notNull(),
+    isRead: boolean("isRead").default(false).notNull(),
+    actionUrl: text("actionUrl"),
+    createdAt: timestamp({ precision: 3, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+  },
+  (table) => [
+    index("Notification_category_idx", [table.category.asc().nullsLast()]),
+    index("Notification_userId_createdAt_idx", [
+      table.userId.asc().nullsLast(),
+      table.createdAt.asc().nullsLast(),
+    ]),
+    index("Notification_userId_isRead_idx", [
+      table.userId.asc().nullsLast(),
+      table.isRead.asc().nullsLast(),
+    ]),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.userId],
+      name: "Notification_userId_fkey",
+      onUpdate: "cascade",
+      onDelete: "restrict",
+    }),
+  ]
+);
 
 export const plantCategory = pgTable("PlantCategory", {
 	categoryId: text().primaryKey().notNull(),
