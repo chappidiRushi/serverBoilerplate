@@ -1,7 +1,8 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { register, login, getProfile } from '../controllers/authController';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { getProfile, login, register } from '../controllers/authController';
 import { authenticate } from '../middleware/auth';
-import { RegisterSchema, LoginSchema } from '../schemas/auth';
+import { LoginSchema, RegisterSchema } from '../schemas/auth';
+
 
 export async function authRoutes(fastify: FastifyInstance) {
   // Validation middleware

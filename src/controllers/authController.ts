@@ -4,7 +4,7 @@ import { JWT } from '../config/constants';
 import { db } from '../db/connection';
 import { user } from '../db/schema';
 import type { LoginInput, RegisterInput } from '../schemas/auth';
-import { AuthenticationError, ConflictError, NotFoundError } from '../types/errors';
+import { Errors } from '../types/errors';
 import { comparePassword, generateJWTPayload, hashPassword } from '../utils/auth';
 import { sanitizeUser } from '../utils/helpers';
 
@@ -22,7 +22,7 @@ export const register = async (
     .limit(1);
 
   if (existingUser.length > 0) {
-    throw new ConflictError('User with this email already exists');
+    throw new Errors.ConflictError('User with this email already exists');
   }
 
   // Hash password
@@ -73,14 +73,14 @@ export const login = async (
     .limit(1);
 
   if (!user1) {
-    throw new AuthenticationError('Invalid email or password');
+    throw new Errors.AuthenticationError('Invalid email or password');
   }
 
   // Verify password
   const isValidPassword = await comparePassword(password, user.password);
 
   if (!isValidPassword) {
-    throw new AuthenticationError('Invalid email or password');
+    throw new Errors.AuthenticationError('Invalid email or password');
   }
 
   // Generate JWT
@@ -111,7 +111,7 @@ export const getProfile = async (request: FastifyRequest, reply: FastifyReply) =
     .limit(1);
 
   if (!user1) {
-    throw new NotFoundError('User not found');
+    throw new Errors.NotFoundError('User not found');
   }
 
   return reply.success({ user }, 'Profile retrieved successfully');
