@@ -14,7 +14,9 @@ const fastify = Fastify({
 const registerPlugins = async () => {
   // CORS
   await fastify.register(import('@fastify/cors'), {
-    origin: true,
+    origin: (origin, cb) => {
+      cb(null, true);
+    },
     credentials: true,
   });
 
@@ -28,8 +30,8 @@ const registerPlugins = async () => {
 
   // Rate limiting
   await fastify.register(import('@fastify/rate-limit'), {
-    max: 100,
-    timeWindow: '15 minutes',
+    max: 1000,
+    timeWindow: '5 minutes',
   });
 
   // JWT
@@ -73,11 +75,12 @@ const registerPlugins = async () => {
 const registerRoutes = async () => {
   // Health check route
   fastify.get('/health', async (request, reply) => {
-    return reply.success({
-      status: 'OK',
-      environment: config.NODE_ENV,
-      uptime: process.uptime(),
-    }, 'Server is running');
+    throw new Error("Simulated error");
+    // return reply.success({
+    //   status: 'OK',
+    //   environment: config.NODE_ENV,
+    //   uptime: process.uptime(),
+    // }, 'Server is running');
   });
 
   // API routes
