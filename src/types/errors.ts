@@ -1,15 +1,11 @@
 import { HTTP_STATUS } from '../config/constants';
 
-export class AppError extends Error {
-  public readonly statusCode: number;
-  public readonly code: string;
-  public readonly details?: any;
-  public readonly isOperational: boolean;
-  public readonly sourceLocation?: {
-    file: string;
-    line: number;
-    column?: number;
-  };
+class AppError extends Error {
+  statusCode: number;
+  code: string;
+  details?: any;
+  isOperational: boolean;
+  sourceLocation?: { file: string; line: number; column?: number };
 
   constructor(
     message: string,
@@ -24,78 +20,66 @@ export class AppError extends Error {
     this.details = details;
     this.isOperational = isOperational;
 
-    Error.captureStackTrace(this, this.constructor);
-    this.sourceLocation = this.parseStackTrace();
+    Error.captureStackTrace?.(this, this.constructor);
+    this.sourceLocation = this.getSourceLocation();
   }
 
-  private parseStackTrace(): { file: string; line: number; column?: number } | undefined {
-    try {
-      if (!this.stack) return undefined;
-
-      const stackLines = this.stack.split('\n');
-      // Find the first line that's not from this error class file
-      for (const line of stackLines) {
-        if (line.includes('at ') && !line.includes('errors.ts') && !line.includes('Error.captureStackTrace')) {
-          // Parse stack trace line format: "at functionName (file:line:column)"
-          const match = line.match(/at .* \((.+):(\d+):(\d+)\)|at (.+):(\d+):(\d+)/);
-          if (match) {
-            const filePath = match[1] || match[4];
-            const lineNumber = parseInt(match[2] || match[5]);
-            const columnNumber = parseInt(match[3] || match[6]);
-            
-            if (filePath && lineNumber) {
-              // Extract just the filename from the full path
-              const fileName = filePath.split('/').pop() || filePath;
-              return {
-                file: fileName,
-                line: lineNumber,
-                column: columnNumber
-              };
-            }
-          }
-        }
-      }
-    } catch (error) {
-      // If parsing fails, return undefined
-      return undefined;
-    }
-    
-    return undefined;
+  private getSourceLocation() {
+    const stack = this.stack?.split('\n').find(
+      line =>
+        line.includes('at ') &&
+        !line.includes('errors.ts') &&
+        !line.includes('Error.captureStackTrace')
+    );
+    if (!stack) return undefined;
+    const match = stack.match(/at (?:.*\()?(.+):(\d+):(\d+)\)?/);
+    if (!match) return undefined;
+    const [, filePath, line, column] = match;
+    return {
+      file: filePath?.split('/').pop() ?? filePath ?? '',
+      line: Number(line),
+      column: Number(column)
+    };
   }
 }
 
-export class ValidationError extends AppError {
-  constructor(message: string = 'Validation failed', details?: any) {
+class ValidationError extends AppError {
+  constructor(message = 'Validation failed', details?: any) {
     super(message, HTTP_STATUS.BAD_REQUEST, 'VALIDATION_ERROR', details);
   }
 }
-
-export class AuthenticationError extends AppError {
-  constructor(message: string = 'Authentication required') {
+class AuthenticationError extends AppError {
+  constructor(message = 'Authentication required') {
     super(message, HTTP_STATUS.UNAUTHORIZED, 'AUTHENTICATION_ERROR');
   }
 }
-
-export class AuthorizationError extends AppError {
-  constructor(message: string = 'Access forbidden') {
+class AuthorizationError extends AppError {
+  constructor(message = 'Access forbidden') {
     super(message, HTTP_STATUS.FORBIDDEN, 'AUTHORIZATION_ERROR');
   }
 }
-
-export class NotFoundError extends AppError {
-  constructor(message: string = 'Resource not found') {
+class NotFoundError extends AppError {
+  constructor(message = 'Resource not found') {
     super(message, HTTP_STATUS.NOT_FOUND, 'NOT_FOUND_ERROR');
   }
 }
-
-export class ConflictError extends AppError {
-  constructor(message: string = 'Resource already exists') {
+class ConflictError extends AppError {
+  constructor(message = 'Resource already exists') {
     super(message, HTTP_STATUS.CONFLICT, 'CONFLICT_ERROR');
   }
 }
-
-export class RateLimitError extends AppError {
-  constructor(message: string = 'Too many requests') {
+class RateLimitError extends AppError {
+  constructor(message = 'Too many requests') {
     super(message, HTTP_STATUS.TOO_MANY_REQUESTS, 'RATE_LIMIT_ERROR');
   }
 }
+
+export const Errors = {
+  AppError,
+  ValidationError,
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
+  ConflictError,
+  RateLimitError,
+};

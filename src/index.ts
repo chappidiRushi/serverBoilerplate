@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import { config } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
+import { requestLogger } from './middleware/requestLogger';
 import { responseFormatter } from './middleware/responseFormatter';
 import { authRoutes } from './routes/auth';
 import { logger } from './utils/logger';
@@ -67,11 +68,13 @@ const registerRoutes = async () => {
   await fastify.register(authRoutes, { prefix: '/api/auth' });
 };
 
+// Set global error handler
 fastify.setErrorHandler(errorHandler);
 
 const start = async () => {
   try {
     fastify.addHook('onRequest', responseFormatter);
+    fastify.addHook('onResponse', requestLogger);
 
     await registerPlugins();
     await registerRoutes();

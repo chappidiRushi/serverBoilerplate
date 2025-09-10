@@ -1,10 +1,10 @@
-import type { FastifyRequest, FastifyReply, FastifyError } from 'fastify';
-import { HTTP_STATUS, MESSAGES } from '../config/constants';
-import { logger } from '../utils/logger';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
-import { AppError } from '../types/errors';
-import type { ErrorResponse } from '../types/response';
+import { HTTP_STATUS } from '../config/constants';
 import { config } from '../config/env';
+import { Errors } from '../types/errors';
+import type { ErrorResponse } from '../types/response';
+import { logger } from '../utils/logger';
 
 export const errorHandler = (
   error: any,
@@ -14,8 +14,8 @@ export const errorHandler = (
   const requestId = (request as any).requestId || 'unknown';
 
   // Extract source location for custom errors
-  const sourceLocation = error instanceof AppError ? error.sourceLocation : undefined;
-  
+  const sourceLocation = error instanceof Errors.AppError ? error.sourceLocation : undefined;
+
   // Log the error with request context and source location
   logger.error('Request error:', {
     requestId,
@@ -37,7 +37,7 @@ export const errorHandler = (
   let details: any;
 
   // Handle custom application errors
-  if (error instanceof AppError) {
+  if (error instanceof Errors.AppError) {
     statusCode = error.statusCode;
     errorCode = error.code;
     message = error.message;
@@ -89,8 +89,8 @@ export const errorHandler = (
   else {
     statusCode = error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR;
     errorCode = 'INTERNAL_ERROR';
-    message = statusCode === HTTP_STATUS.INTERNAL_SERVER_ERROR 
-      ? 'An unexpected error occurred' 
+    message = statusCode === HTTP_STATUS.INTERNAL_SERVER_ERROR
+      ? 'An unexpected error occurred'
       : error.message;
   }
 
