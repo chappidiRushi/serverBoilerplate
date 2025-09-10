@@ -12,7 +12,6 @@ const fastify = Fastify({
 
 // Register plugins
 const registerPlugins = async () => {
-  // CORS
   await fastify.register(import('@fastify/cors'), {
     origin: (origin, cb) => {
       cb(null, true);
@@ -20,26 +19,10 @@ const registerPlugins = async () => {
     credentials: true,
   });
 
-  // Helmet for security
-  await fastify.register(import('@fastify/helmet'), {
-    contentSecurityPolicy: false,
-  });
-
-  // Compression
+  await fastify.register(import('@fastify/helmet'), { contentSecurityPolicy: false });
   await fastify.register(import('@fastify/compress'));
-
-  // Rate limiting
-  await fastify.register(import('@fastify/rate-limit'), {
-    max: 1000,
-    timeWindow: '5 minutes',
-  });
-
-  // JWT
-  await fastify.register(import('@fastify/jwt'), {
-    secret: config.JWT_SECRET,
-  });
-
-  // Swagger
+  await fastify.register(import('@fastify/rate-limit'), { max: 1000, timeWindow: '5 minutes', });
+  await fastify.register(import('@fastify/jwt'), { secret: config.JWT_SECRET, });
   await fastify.register(import('@fastify/swagger'), {
     swagger: {
       info: {
@@ -71,36 +54,26 @@ const registerPlugins = async () => {
   });
 };
 
-// Register routes
 const registerRoutes = async () => {
-  // Health check route
   fastify.get('/health', async (request, reply) => {
-    throw new Error("Simulated error");
-    // return reply.success({
-    //   status: 'OK',
-    //   environment: config.NODE_ENV,
-    //   uptime: process.uptime(),
-    // }, 'Server is running');
+    return reply.success({
+      status: 'OK',
+      environment: config.NODE_ENV,
+      uptime: process.uptime(),
+    }, 'Server is running');
   });
 
   // API routes
   await fastify.register(authRoutes, { prefix: '/api/auth' });
-  // await fastify.register(postsRoutes, { prefix: '/api/posts' });
 };
 
-// Error handler
 fastify.setErrorHandler(errorHandler);
 
-// Start server
 const start = async () => {
   try {
-    // Register response formatter middleware first
     fastify.addHook('onRequest', responseFormatter);
 
-    // Register plugins
     await registerPlugins();
-
-    // Register routes
     await registerRoutes();
 
     const port = config.PORT;
