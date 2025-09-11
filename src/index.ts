@@ -3,9 +3,8 @@ import './config/globals';
 import Fastify from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { config } from './config/env';
+import { RegisterHooks } from './hooks';
 import { errorHandler } from './middleware/errorHandler';
-import { requestLogger } from './middleware/requestLogger';
-import { responseFormatter } from './middleware/responseFormatter';
 import { RegisterPlugins } from './plugins';
 import { RegisterRoutes } from './routes';
 import { logger } from './utils/logger';
@@ -17,8 +16,7 @@ fastify.setErrorHandler(errorHandler);
 
 const start = async () => {
   try {
-    fastify.addHook('onRequest', responseFormatter);
-    fastify.addHook('onResponse', requestLogger);
+    await RegisterHooks(fastify);
     await RegisterPlugins(fastify);
     await RegisterRoutes(fastify);
     const port = config.PORT;

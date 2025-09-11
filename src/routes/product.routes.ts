@@ -1,32 +1,60 @@
-// routes/product.ts
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { z } from "zod/v4";
-const ProductSchema = z.object({
+import { z } from "zod";
+
+export const MetaSchema = z.object({
+  timestamp: z.string(),
+  requestId: z.string(),
+  pagination: z
+    .object({
+      page: z.number(),
+      limit: z.number(),
+      total: z.number(),
+      totalPages: z.number(),
+    })
+    .optional(),
+});
+
+// Generic success response
+export const SuccessResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
+  z.object({
+    success: z.literal(true),
+    message: z.string(),
+    data: dataSchema,
+    meta: MetaSchema,
+  });
+
+
+
+
+// Product schemas
+export const ProductSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1, "Name is required"),
   price: z.number().min(0),
   description: z.string().optional(),
 });
 
-const CreateProductSchema = ProductSchema.omit({ id: true });
-const UpdateProductSchema = ProductSchema.partial().omit({ id: true });
+export const CreateProductSchema = ProductSchema.omit({ id: true });
+export const UpdateProductSchema = ProductSchema.partial().omit({ id: true });
 
-// Mock in-memory store
+// In-memory store
 let products: z.infer<typeof ProductSchema>[] = [];
 
 export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
-
-  fastify.post("/", {
-    schema: {
-      summary: "Create Product",
-      body: CreateProductSchema,
-      response: { 201: ProductSchema },
+  // Create Product
+  fastify.post(
+    "/",
+    {
+      schema: {
+        summary: "Create Product",
+        body: CreateProductSchema,
+        response: { 201: SuccessResponseSchema(ProductSchema) },
+      },
     },
-  },
     async (req, reply) => {
       const newProduct = { id: crypto.randomUUID(), ...req.body };
       products.push(newProduct);
-      return reply.code(201).send(newProduct);
+      return reply.success(newProduct, "Product created successfully", 201);
     }
   );
 
@@ -36,10 +64,12 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "Get All Products",
-        response: { 200: z.array(ProductSchema) },
+        response: { 200: SuccessResponseSchema(z.array(ProductSchema)) },
       },
     },
-    async () => products
+    async (req, reply) => {
+      return reply.success(products, "Products retrieved successfully");
+    }
   );
 
   // Get Product by ID
@@ -49,13 +79,13 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Get Product by ID",
         params: z.object({ id: z.string().uuid() }),
-        response: { 200: ProductSchema },
+        response: { 200: SuccessResponseSchema(ProductSchema) },
       },
     },
     async (req, reply) => {
       const product = products.find((p) => p.id === req.params.id);
       if (!product) return reply.code(404).send({ message: "Product not found" });
-      return product;
+      return reply.success(product, "Product retrieved successfully");
     }
   );
 
@@ -67,7 +97,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Update Product",
         params: z.object({ id: z.string().uuid() }),
         body: UpdateProductSchema,
-        response: { 200: ProductSchema },
+        response: { 200: SuccessResponseSchema(ProductSchema) },
       },
     },
     async (req, reply) => {
@@ -75,7 +105,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       if (index === -1) return reply.code(404).send({ message: "Product not found" });
 
       products[index] = { ...products[index], ...req.body };
-      return products[index];
+      return reply.success(products[index], "Product updated successfully");
     }
   );
 
@@ -86,12 +116,12 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Delete Product",
         params: z.object({ id: z.string().uuid() }),
-        response: { 200: z.object({ message: z.string() }) },
+        response: { 200: SuccessResponseSchema(z.object({ message: z.string() })) },
       },
     },
-    async (req) => {
+    async (req, reply) => {
       products = products.filter((p) => p.id !== req.params.id);
-      return { message: "Product deleted successfully" };
+      return reply.success({ message: "Product deleted successfully" }, "Product deleted");
     }
   );
 };
