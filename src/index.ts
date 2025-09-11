@@ -1,8 +1,3 @@
-import compress from '@fastify/compress';
-import cors from '@fastify/cors';
-import helmet from '@fastify/helmet';
-import jwt from '@fastify/jwt';
-import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import Fastify from 'fastify';
@@ -13,6 +8,7 @@ import { responseFormatter } from './middleware/responseFormatter';
 import { logger } from './utils/logger';
 
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
+import { RegisterPlugins } from './plugins';
 import { productRoutes } from './routes/product.routes';
 
 // Initialize Fastify instance with Zod type provider
@@ -22,53 +18,9 @@ const fastify = Fastify({
 
 // Register plugins
 const registerPlugins = async () => {
-  await fastify.register(cors, {
-    origin: (origin, cb) => cb(null, true),
-    credentials: true,
-  });
-
-  await fastify.register(helmet, { contentSecurityPolicy: false });
-  await fastify.register(compress);
-  await fastify.register(rateLimit, { max: 1000, timeWindow: '5 minutes' });
-  await fastify.register(jwt, { secret: config.JWT_SECRET });
 
   // Swagger with Zod transform
-  await fastify.register(swagger, {
-    openapi: {
-      info: {
-        title: 'Backend API Server',
-        description: 'Comprehensive backend API with authentication and CRUD operations',
-        version: '1.0.0',
-      },
-      servers: [
-        {
-          url: `http://${config.HOST}:${config.PORT}`,
-        },
-      ],
-      components: {
-        securitySchemes: {
-          bearerAuth: {
-            type: 'http',
-            scheme: 'bearer',
-            bearerFormat: 'JWT',
-          },
-        },
-      },
-    },
-    transform: jsonSchemaTransform,
-  });
 
-  await fastify.register(swaggerUi, {
-    routePrefix: '/docs',
-    uiConfig: {
-      docExpansion: 'list',
-      deepLinking: false,
-    },
-  });
-
-  // Set Zod compilers
-  fastify.setValidatorCompiler(validatorCompiler);
-  fastify.setSerializerCompiler(serializerCompiler);
 };
 
 const registerRoutes = async () => {
@@ -95,7 +47,7 @@ const start = async () => {
   try {
     fastify.addHook('onRequest', responseFormatter);
     fastify.addHook('onResponse', requestLogger);
-
+    await RegisterPlugins(fastify);
     await registerPlugins();
     await registerRoutes();
 
