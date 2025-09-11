@@ -1,6 +1,6 @@
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { PaginatedResponseSchema, SuccessResponseSchema } from "../utils/response";
+import { CommonErrorSchema, SuccessResponseSchema } from "../utils/response";
 
 export const ProductSchema = z.object({
   id: z.string().uuid(),
@@ -29,7 +29,8 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (req, reply) => {
       const newProduct = { id: crypto.randomUUID(), ...req.body };
       products.push(newProduct);
-      return reply.success(newProduct, "Product created successfully", 201);
+      reply.send()
+      return reply.success(newProduct, 201, "Product created successfully");
     }
   );
 
@@ -39,11 +40,15 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "Get All Products",
-        response: { 200: PaginatedResponseSchema(ProductSchema) },
+        response: {
+          200: SuccessResponseSchema(z.array(ProductSchema)),
+          ...CommonErrorSchema
+        },
       },
     },
     async (req, reply) => {
-      return reply.success(products, "Products retrieved successfully");
+      throw CE.BAD_REQUEST_400("This is a simulated Error")
+      // return reply.success(products, 200, "Products retrieved successfully");
     }
   );
 
@@ -59,8 +64,8 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (req, reply) => {
       const product = products.find((p) => p.id === req.params.id);
-      if (!product) return reply.code(404).send({ message: "Product not found" });
-      return reply.success(product, "Product retrieved successfully");
+      // if (!product) return reply.code(404).send({ message: "Product not found" });
+      return reply.success(product, 201, "Product retrieved successfully");
     }
   );
 
@@ -77,10 +82,10 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (req, reply) => {
       const index = products.findIndex((p) => p.id === req.params.id);
-      if (index === -1) return reply.code(404).send({ message: "Product not found" });
+      // if (index === -1) return reply.code(404).send({ message: "Product not found" });
 
       products[index] = { ...products[index], ...req.body };
-      return reply.success(products[index], "Product updated successfully");
+      return reply.success(products[index], 200, "Product updated successfully");
     }
   );
 
@@ -96,7 +101,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (req, reply) => {
       products = products.filter((p) => p.id !== req.params.id);
-      return reply.success({ message: "Product deleted successfully" }, "Product deleted");
+      return reply.success({ message: "Product deleted successfully" }, 200, "Product deleted");
     }
   );
 };
