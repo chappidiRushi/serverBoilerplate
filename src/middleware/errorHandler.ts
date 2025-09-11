@@ -5,10 +5,6 @@ import { config } from '../config/env';
 import { HttpError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
-
-
-
-
 type ErrorResponse = {
   success: false;
   message: string;

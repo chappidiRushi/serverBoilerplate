@@ -10,5 +10,3 @@ declare global {
 
 global.APP_CONFIG = config;
 global.CE = err;
-
-

@@ -1,9 +1,8 @@
 import { FastifyInstance } from "fastify";
-import { requestLogger } from "../middleware/requestLogger";
-import { onRequestHook } from "../middleware/responseFormatter";
+import { requestLogger } from "./request.logger.hook";
+import { onRequestHook } from "./response.parser.hook";
 
 export function RegisterHooks(fastify: FastifyInstance) {
   fastify.addHook('onRequest', onRequestHook);
   fastify.addHook('onResponse', requestLogger);
-  // fastify.addHook('onSend', OnSendHook);
 }
