@@ -21,3 +21,9 @@ const parseEnv = () => {
 };
 
 export const config = parseEnv();
+export type Config = typeof config;
+
+
+export function TestMe() {
+
+}
