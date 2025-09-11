@@ -1,39 +1,56 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import type { SuccessResponse } from '../types/response';
+import { z } from 'zod';
 import { generateRequestId } from '../utils/helpers';
+import { PaginatedResponseSchema, SuccessResponseSchema } from '../utils/response';
+
+declare module 'fastify' {
+  interface FastifyReply {
+    success<T>(data: T, message?: string, statusCode?: number): FastifyReply;
+    paginated<T>(
+      data: T[],
+      pagination: { page: number; limit: number; total: number; totalPages: number },
+      message?: string
+    ): FastifyReply;
+  }
+}
 
 export const responseFormatter = async (request: FastifyRequest, reply: FastifyReply) => {
-  // Generate unique request ID for tracing
-  request.requestId = generateRequestId();
-  // will format reply.success(data, message, statusCode)
+  (request as any).requestId = generateRequestId();
   reply.success = function <T>(data: T, message = 'Success', statusCode = 200): FastifyReply {
-    const response: SuccessResponse<T> = {
-      success: true,
+    const response = {
+      status: 'success' as const,
       message,
       data,
       meta: {
         timestamp: new Date().toISOString(),
-        requestId: request.requestId,
+        requestId: (request as any).requestId,
       },
     };
-    return this.status(statusCode).send(response);
+
+    // Validate/parse using Zod
+    const parsedResponse = SuccessResponseSchema(z.any()).parse(response);
+    return this.status(statusCode).send(parsedResponse);
   };
-  // will format reply.paginated(data, pagination, message)
+
   reply.paginated = function <T>(
     data: T[],
     pagination: { page: number; limit: number; total: number; totalPages: number },
     message = 'Data retrieved successfully'
   ): FastifyReply {
-    const response: SuccessResponse<T[]> = {
-      success: true,
+    const response = {
+      status: 'success' as const,
       message,
       data,
       meta: {
         timestamp: new Date().toISOString(),
-        requestId: request.requestId,
+        requestId: (request as any).requestId,
         pagination,
       },
     };
-    return this.status(200).send(response);
+
+    // Validate/parse using Zod
+    const parsedResponse = PaginatedResponseSchema(z.any()).parse(response);
+
+    return this.status(200).send(parsedResponse);
   };
 };

@@ -1,32 +1,7 @@
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { PaginatedResponseSchema, SuccessResponseSchema } from "../utils/response";
 
-export const MetaSchema = z.object({
-  timestamp: z.string(),
-  requestId: z.string(),
-  pagination: z
-    .object({
-      page: z.number(),
-      limit: z.number(),
-      total: z.number(),
-      totalPages: z.number(),
-    })
-    .optional(),
-});
-
-// Generic success response
-export const SuccessResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
-  z.object({
-    success: z.literal(true),
-    message: z.string(),
-    data: dataSchema,
-    meta: MetaSchema,
-  });
-
-
-
-
-// Product schemas
 export const ProductSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1, "Name is required"),
@@ -64,7 +39,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "Get All Products",
-        response: { 200: SuccessResponseSchema(z.array(ProductSchema)) },
+        response: { 200: PaginatedResponseSchema(ProductSchema) },
       },
     },
     async (req, reply) => {

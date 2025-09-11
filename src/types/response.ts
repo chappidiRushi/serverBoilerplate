@@ -19,11 +19,6 @@ export interface ApiResponse<T = any> {
   };
 }
 
-export interface SuccessResponse<T = any> extends ApiResponse<T> {
-  success: true;
-  data: T;
-}
-
 export interface ErrorResponse extends ApiResponse {
   success: false;
   error: {
