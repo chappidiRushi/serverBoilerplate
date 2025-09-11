@@ -23,10 +23,3 @@ export const SuccessResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) => 
   }),
 });
 
-export const PaginatedResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) => z.object({
-  status: z.literal('success'),
-  message: z.string().optional(),
-  data: z.array(dataSchema),
-  meta: MetaSchema,
-});
-

@@ -1,22 +1,18 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { generateRequestId } from '../utils/helpers';
-import { PaginatedResponseSchema, SuccessResponseSchema } from '../utils/response';
+import { SuccessResponseSchema } from '../utils/response';
 
 declare module 'fastify' {
   interface FastifyReply {
-    success<T>(data: T, message?: string, statusCode?: number): FastifyReply;
-    paginated<T>(
-      data: T[],
-      pagination: { page: number; limit: number; total: number; totalPages: number },
-      message?: string
-    ): FastifyReply;
+    success<T>(data: T, statusCode: number, message?: string): FastifyReply;
   }
 }
 
-export const responseFormatter = async (request: FastifyRequest, reply: FastifyReply) => {
-  (request as any).requestId = generateRequestId();
-  reply.success = function <T>(data: T, message = 'Success', statusCode = 200): FastifyReply {
+export const onRequestHook = async (request: FastifyRequest, reply: FastifyReply) => {
+  request.requestId = generateRequestId();
+
+  reply.success = function <T>(data: T, statusCode: number, message = 'Success'): FastifyReply {
     const response = {
       status: 'success' as const,
       message,
@@ -27,30 +23,31 @@ export const responseFormatter = async (request: FastifyRequest, reply: FastifyR
       },
     };
 
-    // Validate/parse using Zod
+    try {
+      const zodSchema = (request as any)?.routeOptions?.schema?.response?.[statusCode]
+      if (zodSchema) {
+        const parsedResponse = zodSchema.parse(response);
+        return this.status(statusCode).send(parsedResponse);
+      }
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        return this.status(400).send({
+          success: false,
+          message: 'Response Validation Failed',
+          error: {
+            code: 400,
+            message: e.message,
+            details: e.issues
+          },
+          meta: {
+            timestamp: new Date().toISOString(),
+            requestId: (request as any).requestId,
+          },
+        });
+      }
+    }
+
     const parsedResponse = SuccessResponseSchema(z.any()).parse(response);
     return this.status(statusCode).send(parsedResponse);
-  };
-
-  reply.paginated = function <T>(
-    data: T[],
-    pagination: { page: number; limit: number; total: number; totalPages: number },
-    message = 'Data retrieved successfully'
-  ): FastifyReply {
-    const response = {
-      status: 'success' as const,
-      message,
-      data,
-      meta: {
-        timestamp: new Date().toISOString(),
-        requestId: (request as any).requestId,
-        pagination,
-      },
-    };
-
-    // Validate/parse using Zod
-    const parsedResponse = PaginatedResponseSchema(z.any()).parse(response);
-
-    return this.status(200).send(parsedResponse);
   };
 };

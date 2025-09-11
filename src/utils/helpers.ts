@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 export const generateRequestId = (): string => {
-  return `req_${crypto.randomBytes(8).toString('hex')}`;
+  return `REQ_${crypto.randomBytes(8).toString('hex')}`;
 };
 
 export const sleep = (ms: number): Promise<void> => {
