@@ -1,7 +1,7 @@
 import './config/globals';
 
 import Fastify from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { type ZodTypeProvider } from 'fastify-type-provider-zod';
 import { config } from './config/env';
 import { RegisterHooks } from './hooks';
 import { errorHandler } from './middleware/errorHandler';

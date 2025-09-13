@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { type FastifyInstance } from "fastify";
 import { requestLogger } from "./request.logger.hook";
 import { onRequestHook } from "./response.parser.hook";
 

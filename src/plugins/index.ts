@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { type FastifyInstance } from "fastify";
 import { SecurityPlugin } from "./security.plugin";
 import { SwaggerPlugin } from './swagger.pulgin';
 

@@ -1,6 +1,7 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { CommonErrorSchema, SuccessResponseSchema } from "../utils/response";
+import { TestME } from "../utils/auth";
 
 export const ProductSchema = z.object({
   id: z.string().uuid(),
@@ -8,7 +9,6 @@ export const ProductSchema = z.object({
   price: z.number().min(0),
   description: z.string().optional(),
 });
-
 export const CreateProductSchema = ProductSchema.omit({ id: true });
 export const UpdateProductSchema = ProductSchema.partial().omit({ id: true });
 
@@ -84,7 +84,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const index = products.findIndex((p) => p.id === req.params.id);
       // if (index === -1) return reply.code(404).send({ message: "Product not found" });
 
-      products[index] = { ...products[index], ...req.body };
+      products[index] = { ...products[index], ...req.body } as any;
       return reply.success(products[index], 200, "Product updated successfully");
     }
   );
@@ -105,3 +105,5 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
     }
   );
 };
+
+TestME()

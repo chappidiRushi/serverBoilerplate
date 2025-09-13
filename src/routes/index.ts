@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { type FastifyInstance } from "fastify";
 import { config } from "../config/env";
 import { productRoutes } from "./product.routes";
 
@@ -10,6 +10,7 @@ export async function RegisterRoutes(fastify: FastifyInstance) {
         environment: config.NODE_ENV,
         uptime: process.uptime(),
       },
+      200, 
       'Server is running'
     );
   });

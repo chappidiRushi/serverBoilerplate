@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { type FastifyInstance } from "fastify";
 import { logger } from "./logger";
 
 export function setupShutdown(fastify: FastifyInstance) {

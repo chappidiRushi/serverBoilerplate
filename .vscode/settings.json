@@ -16,5 +16,6 @@
     "fkey",
     "pkey",
     "repotting"
-  ]
+  ],
+  // "typescript.tsdk": "node_modules/typescript/lib"
 }

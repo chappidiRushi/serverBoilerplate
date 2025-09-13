@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import jwt from '@fastify/jwt';
 import rateLimit from '@fastify/rate-limit';
-import { FastifyInstance } from 'fastify';
+import { type FastifyInstance } from 'fastify';
 import { config } from '../config/env';
 
 
