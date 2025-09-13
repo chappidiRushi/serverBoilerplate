@@ -47,8 +47,8 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (req, reply) => {
-      throw CE.BAD_REQUEST_400("This is a simulated Error")
-      // return reply.success(products, 200, "Products retrieved successfully");
+      // throw CE.BAD_REQUEST_400("This is a simulated Error")
+      return reply.success(products, 200, "Products retrieved successfully");
     }
   );
 
