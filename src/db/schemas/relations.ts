@@ -13,6 +13,7 @@ import {
 	plantVariantToTags,
 	potCategory,
 	potMaterial,
+	color,
 	potSizeProfile,
 	potVariantImage,
 	potVariants,
@@ -493,124 +494,124 @@ export const tagGroupsRelations = relations(tagGroups, ({ many }) => ({
 // 	}),
 // }));
 
-// export const plantsRelations = relations(plants, ({many}) => ({
-// 	notifyMeSubscriptions: many(notifyMeSubscription),
-// 	plantVariants: many(plantVariants),
-// 	plantCartItems: many(plantCartItem),
-// 	plantCheckoutLaters: many(plantCheckoutLater),
-// 	plantSizeProfiles: many(plantSizeProfile),
-// 	plantOrderItems: many(plantOrderItem),
-// 	returnsRefunds_plantId: many(returnsRefunds, {
-// 		relationName: "returnsRefunds_plantId_plants_plantId"
-// 	}),
-// 	returnsRefunds_exchangeProductId: many(returnsRefunds, {
-// 		relationName: "returnsRefunds_exchangeProductId_plants_plantId"
-// 	}),
-// 	promotionProducts: many(promotionProduct),
-// 	plantStockAuditLogs: many(plantStockAuditLog),
-// 	plantDamagedProducts: many(plantDamagedProduct),
-// 	purchaseOrderItems: many(purchaseOrderItems),
-// 	reviews: many(review),
-// 	plantSalesAnalytics: many(plantSalesAnalytics),
-// 	plantWarehouseInventories: many(plantWarehouseInventory),
-// 	plantRestockEventLogs: many(plantRestockEventLog),
-// 	warehouseCartItems: many(warehouseCartItem),
-// 	plantSupplierInventories: many(plantSupplierInventory),
-// 	productCategories: many(productCategories),
-// }));
+export const plantsRelations = relations(plants, ({many}) => ({
+	// notifyMeSubscriptions: many(notifyMeSubscription),
+	plantVariants: many(plantVariants),
+	// plantCartItems: many(plantCartItem),
+	// plantCheckoutLaters: many(plantCheckoutLater),
+	plantSizeProfiles: many(plantSizeProfile),
+	// plantOrderItems: many(plantOrderItem),
+	// returnsRefunds_plantId: many(returnsRefunds, {
+	// 	relationName: "returnsRefunds_plantId_plants_plantId"
+	// }),
+	// returnsRefunds_exchangeProductId: many(returnsRefunds, {
+	// 	relationName: "returnsRefunds_exchangeProductId_plants_plantId"
+	// }),
+	// promotionProducts: many(promotionProduct),
+	// plantStockAuditLogs: many(plantStockAuditLog),
+	// plantDamagedProducts: many(plantDamagedProduct),
+	// purchaseOrderItems: many(purchaseOrderItems),
+	// reviews: many(review),
+	// plantSalesAnalytics: many(plantSalesAnalytics),
+	// plantWarehouseInventories: many(plantWarehouseInventory),
+	// plantRestockEventLogs: many(plantRestockEventLog),
+	// warehouseCartItems: many(warehouseCartItem),
+	// plantSupplierInventories: many(plantSupplierInventory),
+	productCategories: many(productCategories),
+}));
 
-// export const plantVariantsRelations = relations(plantVariants, ({one, many}) => ({
-// 	notifyMeSubscriptions: many(notifyMeSubscription),
-// 	plant: one(plants, {
-// 		fields: [plantVariants.plantId],
-// 		references: [plants.plantId]
-// 	}),
-// 	color: one(color, {
-// 		fields: [plantVariants.colorId],
-// 		references: [color.id]
-// 	}),
-// 	plantSizeProfile: one(plantSizeProfile, {
-// 		fields: [plantVariants.plantSizeId],
-// 		references: [plantSizeProfile.plantSizeId]
-// 	}),
-// 	plantCartItems: many(plantCartItem),
-// 	plantCheckoutLaters: many(plantCheckoutLater),
-// 	plantVariantImages: many(plantVariantImage),
-// 	plantOrderItems: many(plantOrderItem),
-// 	promotionProducts: many(promotionProduct),
-// 	plantStockAuditLogs: many(plantStockAuditLog),
-// 	plantDamagedProducts: many(plantDamagedProduct),
-// 	purchaseOrderItems: many(purchaseOrderItems),
-// 	reviews: many(review),
-// 	plantSalesAnalytics: many(plantSalesAnalytics),
-// 	plantWarehouseInventories: many(plantWarehouseInventory),
-// 	plantRestockEventLogs: many(plantRestockEventLog),
-// 	warehouseCartItems: many(warehouseCartItem),
-// 	plantSupplierInventories: many(plantSupplierInventory),
-// 	plantVariantToTags: many(plantVariantToTags),
-// }));
+export const plantVariantsRelations = relations(plantVariants, ({one, many}) => ({
+	// notifyMeSubscriptions: many(notifyMeSubscription),
+	plant: one(plants, {
+		fields: [plantVariants.plantId],
+		references: [plants.plantId]
+	}),
+	color: one(color, {
+		fields: [plantVariants.colorId],
+		references: [color.id]
+	}),
+	plantSizeProfile: one(plantSizeProfile, {
+		fields: [plantVariants.plantSizeId],
+		references: [plantSizeProfile.plantSizeId]
+	}),
+	// plantCartItems: many(plantCartItem),
+	// plantCheckoutLaters: many(plantCheckoutLater),
+	// plantVariantImages: many(plantVariantImage),
+	// plantOrderItems: many(plantOrderItem),
+	// promotionProducts: many(promotionProduct),
+	// plantStockAuditLogs: many(plantStockAuditLog),
+	// plantDamagedProducts: many(plantDamagedProduct),
+	// purchaseOrderItems: many(purchaseOrderItems),
+	// reviews: many(review),
+	// plantSalesAnalytics: many(plantSalesAnalytics),
+	// plantWarehouseInventories: many(plantWarehouseInventory),
+	// plantRestockEventLogs: many(plantRestockEventLog),
+	// warehouseCartItems: many(warehouseCartItem),
+	// plantSupplierInventories: many(plantSupplierInventory),
+	plantVariantToTags: many(plantVariantToTags),
+}));
 
-// export const potCategoryRelations = relations(potCategory, ({many}) => ({
-// 	notifyMeSubscriptions: many(notifyMeSubscription),
-// 	potCartItems: many(potCartItem),
-// 	potCheckoutLaters: many(potCheckoutLater),
-// 	potOrderItems: many(potOrderItem),
-// 	promotionProducts: many(promotionProduct),
-// 	potStockAuditLogs: many(potStockAuditLog),
-// 	purchaseOrderItems: many(purchaseOrderItems),
-// 	potDamagedProducts: many(potDamagedProduct),
-// 	reviews: many(review),
-// 	potSalesAnalytics: many(potSalesAnalytics),
-// 	potWarehouseInventories: many(potWarehouseInventory),
-// 	potRestockEventLogs: many(potRestockEventLog),
-// 	warehouseCartItems: many(warehouseCartItem),
-// 	potSupplierInventories: many(potSupplierInventory),
-// 	potSizeProfiles: many(potSizeProfile),
-// }));
+export const potCategoryRelations = relations(potCategory, ({many}) => ({
+	// notifyMeSubscriptions: many(notifyMeSubscription),
+	// potCartItems: many(potCartItem),
+	// potCheckoutLaters: many(potCheckoutLater),
+	// potOrderItems: many(potOrderItem),
+	// promotionProducts: many(promotionProduct),
+	// potStockAuditLogs: many(potStockAuditLog),
+	// purchaseOrderItems: many(purchaseOrderItems),
+	// potDamagedProducts: many(potDamagedProduct),
+	// reviews: many(review),
+	// potSalesAnalytics: many(potSalesAnalytics),
+	// potWarehouseInventories: many(potWarehouseInventory),
+	// potRestockEventLogs: many(potRestockEventLog),
+	// warehouseCartItems: many(warehouseCartItem),
+	// potSupplierInventories: many(potSupplierInventory),
+	potSizeProfiles: many(potSizeProfile),
+}));
 
-// export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
-// 	notifyMeSubscriptions: many(notifyMeSubscription),
-// 	potCartItems: many(potCartItem),
-// 	potCheckoutLaters: many(potCheckoutLater),
-// 	potVariantImages: many(potVariantImage),
-// 	potOrderItems: many(potOrderItem),
-// 	promotionProducts: many(promotionProduct),
-// 	potStockAuditLogs: many(potStockAuditLog),
-// 	purchaseOrderItems: many(purchaseOrderItems),
-// 	potDamagedProducts: many(potDamagedProduct),
-// 	reviews: many(review),
-// 	potSalesAnalytics: many(potSalesAnalytics),
-// 	potWarehouseInventories: many(potWarehouseInventory),
-// 	potRestockEventLogs: many(potRestockEventLog),
-// 	warehouseCartItems: many(warehouseCartItem),
-// 	potSupplierInventories: many(potSupplierInventory),
-// 	color: one(color, {
-// 		fields: [potVariants.colorId],
-// 		references: [color.id]
-// 	}),
-// 	sizeMaterialOption: one(sizeMaterialOption, {
-// 		fields: [potVariants.sizeMaterialOptionId],
-// 		references: [sizeMaterialOption.sizeMaterialOptionId]
-// 	}),
-// 	compatiblePots: many(compatiblePots),
-// 	potVariantToTags: many(potVariantToTags),
-// }));
+export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
+	// notifyMeSubscriptions: many(notifyMeSubscription),
+	// potCartItems: many(potCartItem),
+	// potCheckoutLaters: many(potCheckoutLater),
+	potVariantImages: many(potVariantImage),
+	// potOrderItems: many(potOrderItem),
+	// promotionProducts: many(promotionProduct),
+	// potStockAuditLogs: many(potStockAuditLog),
+	// purchaseOrderItems: many(purchaseOrderItems),
+	// potDamagedProducts: many(potDamagedProduct),
+	// reviews: many(review),
+	// potSalesAnalytics: many(potSalesAnalytics),
+	// potWarehouseInventories: many(potWarehouseInventory),
+	// potRestockEventLogs: many(potRestockEventLog),
+	// warehouseCartItems: many(warehouseCartItem),
+	// potSupplierInventories: many(potSupplierInventory),
+	color: one(color, {
+		fields: [potVariants.colorId],
+		references: [color.id]
+	}),
+	sizeMaterialOption: one(sizeMaterialOption, {
+		fields: [potVariants.sizeMaterialOptionId],
+		references: [sizeMaterialOption.sizeMaterialOptionId]
+	}),
+	compatiblePots: many(compatiblePots),
+	potVariantToTags: many(potVariantToTags),
+}));
 
-// export const colorRelations = relations(color, ({many}) => ({
-// 	plantVariants: many(plantVariants),
-// 	potVariants: many(potVariants),
-// }));
+export const colorRelations = relations(color, ({many}) => ({
+	plantVariants: many(plantVariants),
+	potVariants: many(potVariants),
+}));
 
-// export const plantSizeProfileRelations = relations(plantSizeProfile, ({one, many}) => ({
-// 	plantVariants: many(plantVariants),
-// 	plant: one(plants, {
-// 		fields: [plantSizeProfile.plantId],
-// 		references: [plants.plantId]
-// 	}),
-// 	plantCareGuidelines: many(plantCareGuidelines),
-// 	plantFertilizerSchedules: many(plantFertilizerSchedule),
-// 	compatiblePots: many(compatiblePots),
-// }));
+export const plantSizeProfileRelations = relations(plantSizeProfile, ({one, many}) => ({
+	plantVariants: many(plantVariants),
+	plant: one(plants, {
+		fields: [plantSizeProfile.plantId],
+		references: [plants.plantId]
+	}),
+	plantCareGuidelines: many(plantCareGuidelines),
+	plantFertilizerSchedules: many(plantFertilizerSchedule),
+	compatiblePots: many(compatiblePots),
+}));
 
 // export const customerAddressRelations = relations(customerAddress, ({one, many}) => ({
 // 	customer: one(customer, {
