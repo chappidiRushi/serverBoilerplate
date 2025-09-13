@@ -22,6 +22,510 @@ export const prismaMigrations = pgTable("_prisma_migrations", {
 	appliedStepsCount: integer("applied_steps_count").default(0).notNull(),
 });
 
+
+
+export const plants = pgTable("Plants", {
+	plantId: text().primaryKey().notNull(),
+	name: text().notNull(),
+	scientificName: text(),
+	description: text().notNull(),
+	isProductActive: boolean().default(true).notNull(),
+	isFeatured: boolean().notNull(),
+	plantClass: text(),
+	plantSeries: text(),
+	placeOfOrigin: text(),
+	auraType: text(),
+	biodiversityBooster: boolean(),
+	carbonAbsorber: boolean(),
+	minimumTemperature: integer(),
+	maximumTemperature: integer(),
+	soil: text(),
+	repotting: text(),
+	maintenance: text(),
+	insideBox: text().array().default(["RAY"]),
+	benefits: text().array().default(["RAY"]),
+	spiritualUseCase: text().array().default(["RAY"]),
+	bestForEmotion: text().array().default(["RAY"]),
+	bestGiftFor: text().array().default(["RAY"]),
+	funFacts: text().array().default(["RAY"]),
+	associatedDeity: text().array().default(["RAY"]),
+	godAligned: text().array().default(["RAY"]),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	index("Plants_isFeatured_idx").using("btree", table.isFeatured.asc().nullsLast().op("bool_ops")),
+	index("Plants_isProductActive_idx").using("btree", table.isProductActive.asc().nullsLast().op("bool_ops")),
+	index("Plants_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+]);
+
+export const plantVariants = pgTable("PlantVariants", {
+	variantId: text().primaryKey().notNull(),
+	plantId: text().notNull(),
+	plantSizeId: text().notNull(),
+	colorId: text().notNull(),
+	sku: text().notNull(),
+	isProductActive: boolean().default(true).notNull(),
+	mrp: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
+	notes: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	uniqueIndex("PlantVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.plantId],
+		foreignColumns: [plants.plantId],
+		name: "PlantVariants_plantId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.colorId],
+		foreignColumns: [color.id],
+		name: "PlantVariants_colorId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.plantSizeId],
+		foreignColumns: [plantSizeProfile.plantSizeId],
+		name: "PlantVariants_plantSizeId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const potCategory = pgTable("PotCategory", {
+	categoryId: text().primaryKey().notNull(),
+	name: text().notNull(),
+	description: text(),
+	publicId: text(),
+	mediaUrl: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+});
+
+
+export const serialTracker = pgTable(
+  "SerialTracker",
+  {
+    id: serial("id").primaryKey().notNull(),
+    entityCode: text("entityCode").notNull(),
+    year: integer("year").notNull(),
+    lastSerial: integer("lastSerial").default(0).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("SerialTracker_entityCode_year_key", [
+      table.entityCode.asc().nullsLast(),
+      table.year.asc().nullsLast(),
+    ]),
+  ]
+);
+
+export const warehouse = pgTable("Warehouse", {
+	warehouseId: text().primaryKey().notNull(),
+	name: text().notNull(),
+	capacityUnits: integer(),
+	officeEmail: text(),
+	officePhone: text(),
+	officeAddress: jsonb(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+});
+
+
+export const potVariantImage = pgTable("PotVariantImage", {
+	id: text().primaryKey().notNull(),
+	potVariantId: text().notNull(),
+	publicId: text().notNull(),
+	mediaUrl: text().notNull(),
+	mediaType: text(),
+	resourceType: text(),
+	isPrimary: boolean().default(false).notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	index("PotVariantImage_potVariantId_idx").using("btree", table.potVariantId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.potVariantId],
+		foreignColumns: [potVariants.potVariantId],
+		name: "PotVariantImage_potVariantId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const plantVariantImage = pgTable("PlantVariantImage", {
+	id: text().primaryKey().notNull(),
+	plantVariantId: text().notNull(),
+	mediaUrl: text().notNull(),
+	publicId: text().notNull(),
+	mediaType: text(),
+	resourceType: text(),
+	isPrimary: boolean().default(false).notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	index("PlantVariantImage_plantVariantId_idx").using("btree", table.plantVariantId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.plantVariantId],
+		foreignColumns: [plantVariants.variantId],
+		name: "PlantVariantImage_plantVariantId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const plantSizeProfile = pgTable(
+  "PlantSizeProfile",
+  {
+    plantSizeId: text("plantSizeId").primaryKey().notNull(),
+    plantId: text("plantId").notNull(),
+    plantSize: text("plantSize").notNull(), // changed `size()` → `text()` since Drizzle has no size type
+    height: numeric("height", { precision: 65, scale: 30 }).notNull(),
+    weight: numeric("weight", { precision: 65, scale: 30 }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("PlantSizeProfile_plantId_plantSize_key", [
+      table.plantId.asc().nullsLast(),
+      table.plantSize.asc().nullsLast(),
+    ]),
+    foreignKey({
+      columns: [table.plantId],
+      foreignColumns: [plants.plantId],
+      name: "PlantSizeProfile_plantId_fkey",
+      onUpdate: "cascade",
+      onDelete: "restrict",
+    }),
+  ]
+);
+
+export const color = pgTable("Color", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(),
+	hexCode: text().default('#FFFFFF').notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	uniqueIndex("Color_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
+]);
+
+export const plantCareGuidelines = pgTable("PlantCareGuidelines", {
+	plantCareId: text().primaryKey().notNull(),
+	plantSizeId: text().notNull(),
+	sunlightTypeId: text().notNull(),
+	humidityLevelId: text().notNull(),
+	season: text().notNull(),
+	wateringFrequency: text().notNull(),
+	waterAmountMl: numeric({ precision: 65, scale: 30 }).notNull(),
+	wateringMethod: text().notNull(),
+	recommendedTime: text().notNull(),
+	soilTypes: text().notNull(),
+	preferredSeasons: text().notNull(),
+	careNotes: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	uniqueIndex("PlantCareGuidelines_plantSizeId_season_key").using("btree", table.plantSizeId.asc().nullsLast().op("text_ops"), table.season.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.plantSizeId],
+		foreignColumns: [plantSizeProfile.plantSizeId],
+		name: "PlantCareGuidelines_plantSizeId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.sunlightTypeId],
+		foreignColumns: [sunlightTypes.sunlightId],
+		name: "PlantCareGuidelines_sunlightTypeId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.humidityLevelId],
+		foreignColumns: [humidityLevel.humidityId],
+		name: "PlantCareGuidelines_humidityLevelId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const sunlightTypes = pgTable("SunlightTypes", {
+	sunlightId: text().primaryKey().notNull(),
+	typeName: text().notNull(),
+	mediaUrl: text().notNull(),
+	publicId: text().notNull(),
+	description: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+});
+
+export const humidityLevel = pgTable("HumidityLevel", {
+	humidityId: text().primaryKey().notNull(),
+	level: text().notNull(),
+	description: text(),
+	suitableZones: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+});
+
+export const plantFertilizerSchedule = pgTable("PlantFertilizerSchedule", {
+	fertilizerScheduleId: text().primaryKey().notNull(),
+	plantSizeId: text().notNull(),
+	fertilizerId: text().notNull(),
+	applicationFrequency: text().notNull(),
+	applicationMethod: text().array().default(["RAY"]),
+	applicationSeason: text().notNull(),
+	applicationTime: text().notNull(),
+	benefits: text().array().default(["RAY"]),
+	dosageAmount: numeric({ precision: 65, scale: 30 }).notNull(),
+	safetyNotes: text().array().default(["RAY"]),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	uniqueIndex("PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key").using("btree", table.plantSizeId.asc().nullsLast().op("text_ops"), table.fertilizerId.asc().nullsLast().op("text_ops"), table.applicationSeason.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.plantSizeId],
+		foreignColumns: [plantSizeProfile.plantSizeId],
+		name: "PlantFertilizerSchedule_plantSizeId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.fertilizerId],
+		foreignColumns: [fertilizers.fertilizerId],
+		name: "PlantFertilizerSchedule_fertilizerId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const fertilizers = pgTable("Fertilizers", {
+	fertilizerId: text().primaryKey().notNull(),
+	name: text().notNull(),
+	type: text().notNull(),
+	composition: text().notNull(),
+	description: text(),
+	caution: text(),
+	isEcoFriendly: boolean().notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+});
+
+
+export const potMaterial = pgTable("PotMaterial", {
+	materialId: text().primaryKey().notNull(),
+	name: text().notNull(),
+	description: text().notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	uniqueIndex("PotMaterial_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
+]);
+
+export const tagGroups = pgTable("TagGroups", {
+	groupId: text().primaryKey().notNull(),
+	groupName: text().notNull(),
+	groupDescription: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+});
+
+export const tags = pgTable("Tags", {
+	tagId: text().primaryKey().notNull(),
+	groupId: text().notNull(),
+	tagName: text().notNull(),
+	tagDesc: text().notNull(),
+	tagIcon: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	foreignKey({
+		columns: [table.groupId],
+		foreignColumns: [tagGroups.groupId],
+		name: "Tags_groupId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+
+export const notification = pgTable(
+  "Notification",
+  {
+    id: text("id").primaryKey().notNull(),
+    userId: text("userId").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    category: notificationCategory("category").default("GENERAL").notNull(),
+    isRead: boolean("isRead").default(false).notNull(),
+    actionUrl: text("actionUrl"),
+    createdAt: timestamp({ precision: 3, mode: "string" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+  },
+  (table) => [
+    index("Notification_category_idx", [table.category.asc().nullsLast()]),
+    index("Notification_userId_createdAt_idx", [
+      table.userId.asc().nullsLast(),
+      table.createdAt.asc().nullsLast(),
+    ]),
+    index("Notification_userId_isRead_idx", [
+      table.userId.asc().nullsLast(),
+      table.isRead.asc().nullsLast(),
+    ]),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.userId],
+      name: "Notification_userId_fkey",
+      onUpdate: "cascade",
+      onDelete: "restrict",
+    }),
+  ]
+);
+
+export const plantCategory = pgTable("PlantCategory", {
+	categoryId: text().primaryKey().notNull(),
+	name: text().notNull(),
+	description: text().notNull(),
+	publicId: text().notNull(),
+	mediaUrl: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+});
+
+export const potVariants = pgTable("PotVariants", {
+	potVariantId: text().primaryKey().notNull(),
+	colorId: text().notNull(),
+	potName: text().notNull(),
+	sku: text().notNull(),
+	mrp: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
+	isEcoFriendly: boolean().default(false).notNull(),
+	isPremium: boolean().default(false).notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+	sizeMaterialOptionId: text().notNull(),
+}, (table) => [
+	index("PotVariants_colorId_idx").using("btree", table.colorId.asc().nullsLast().op("text_ops")),
+	uniqueIndex("PotVariants_sizeMaterialOptionId_colorId_key").using("btree", table.sizeMaterialOptionId.asc().nullsLast().op("text_ops"), table.colorId.asc().nullsLast().op("text_ops")),
+	uniqueIndex("PotVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.colorId],
+		foreignColumns: [color.id],
+		name: "PotVariants_colorId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.sizeMaterialOptionId],
+		foreignColumns: [sizeMaterialOption.sizeMaterialOptionId],
+		name: "PotVariants_sizeMaterialOptionId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const potSizeProfile = pgTable("PotSizeProfile", {
+	potSizeProfileId: text().primaryKey().notNull(),
+	categoryId: text().notNull(),
+	size: text().notNull(),
+	height: numeric({ precision: 65, scale: 30 }),
+	weight: numeric({ precision: 65, scale: 30 }),
+}, (table) => [
+	index("PotSizeProfile_categoryId_idx").using("btree", table.categoryId.asc().nullsLast().op("text_ops")),
+	uniqueIndex("PotSizeProfile_categoryId_size_key").using("btree", table.categoryId.asc().nullsLast().op("text_ops"), table.size.asc().nullsLast().op("text_ops")),
+	index("PotSizeProfile_size_idx").using("btree", table.size.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.categoryId],
+		foreignColumns: [potCategory.categoryId],
+		name: "PotSizeProfile_categoryId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const sizeMaterialOption = pgTable("SizeMaterialOption", {
+	sizeMaterialOptionId: text().primaryKey().notNull(),
+	potSizeProfileId: text().notNull(),
+	materialId: text().notNull(),
+}, (table) => [
+	uniqueIndex("SizeMaterialOption_potSizeProfileId_materialId_key").using("btree", table.potSizeProfileId.asc().nullsLast().op("text_ops"), table.materialId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.potSizeProfileId],
+		foreignColumns: [potSizeProfile.potSizeProfileId],
+		name: "SizeMaterialOption_potSizeProfileId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.materialId],
+		foreignColumns: [potMaterial.materialId],
+		name: "SizeMaterialOption_materialId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const productCategories = pgTable("_ProductCategories", {
+	a: text("A").notNull(),
+	b: text("B").notNull(),
+}, (table) => [
+	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.a],
+		foreignColumns: [plantCategory.categoryId],
+		name: "_ProductCategories_A_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.b],
+		foreignColumns: [plants.plantId],
+		name: "_ProductCategories_B_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.a, table.b], name: "_ProductCategories_AB_pkey" }),
+]);
+
+export const compatiblePots = pgTable("_CompatiblePots", {
+	a: text("A").notNull(),
+	b: text("B").notNull(),
+}, (table) => [
+	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.a],
+		foreignColumns: [plantSizeProfile.plantSizeId],
+		name: "_CompatiblePots_A_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.b],
+		foreignColumns: [potVariants.potVariantId],
+		name: "_CompatiblePots_B_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.a, table.b], name: "_CompatiblePots_AB_pkey" }),
+]);
+
+export const plantVariantToTags = pgTable("_PlantVariantToTags", {
+	a: text("A").notNull(),
+	b: text("B").notNull(),
+}, (table) => [
+	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.a],
+		foreignColumns: [plantVariants.variantId],
+		name: "_PlantVariantToTags_A_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.b],
+		foreignColumns: [tags.tagId],
+		name: "_PlantVariantToTags_B_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.a, table.b], name: "_PlantVariantToTags_AB_pkey" }),
+]);
+
+export const potVariantToTags = pgTable("_PotVariantToTags", {
+	a: text("A").notNull(),
+	b: text("B").notNull(),
+}, (table) => [
+	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.a],
+		foreignColumns: [potVariants.potVariantId],
+		name: "_PotVariantToTags_A_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.b],
+		foreignColumns: [tags.tagId],
+		name: "_PotVariantToTags_B_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.a, table.b], name: "_PotVariantToTags_AB_pkey" }),
+]);
+
 // export const deliveryCharge = pgTable("DeliveryCharge", {
 // 	id: text().primaryKey().notNull(),
 // 	pinCode: text().notNull(),
@@ -44,25 +548,7 @@ export const prismaMigrations = pgTable("_prisma_migrations", {
 // 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
 // });
 
-export const serialTracker = pgTable(
-  "SerialTracker",
-  {
-    id: serial("id").primaryKey().notNull(),
-    entityCode: text("entityCode").notNull(),
-    year: integer("year").notNull(),
-    lastSerial: integer("lastSerial").default(0).notNull(),
-    createdAt: timestamp({ precision: 3, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
-  },
-  (table) => [
-    uniqueIndex("SerialTracker_entityCode_year_key", [
-      table.entityCode.asc().nullsLast(),
-      table.year.asc().nullsLast(),
-    ]),
-  ]
-);
+
 
 // export const role = pgTable("Role", {
 // 	roleId: text().primaryKey().notNull(),
@@ -443,16 +929,7 @@ export const serialTracker = pgTable(
 // 	}).onUpdate("cascade").onDelete("restrict"),
 // ]);
 
-export const warehouse = pgTable("Warehouse", {
-	warehouseId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	capacityUnits: integer(),
-	officeEmail: text(),
-	officePhone: text(),
-	officeAddress: jsonb(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-});
+
 
 // export const warehouseEmployee = pgTable("WarehouseEmployee", {
 // 	warehouseEmployeeId: text().primaryKey().notNull(),
@@ -601,82 +1078,7 @@ export const warehouse = pgTable("Warehouse", {
 // 	}).onUpdate("cascade").onDelete("set null"),
 // ]);
 
-export const plants = pgTable("Plants", {
-	plantId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	scientificName: text(),
-	description: text().notNull(),
-	isProductActive: boolean().default(true).notNull(),
-	isFeatured: boolean().notNull(),
-	plantClass: text(),
-	plantSeries: text(),
-	placeOfOrigin: text(),
-	auraType: text(),
-	biodiversityBooster: boolean(),
-	carbonAbsorber: boolean(),
-	minimumTemperature: integer(),
-	maximumTemperature: integer(),
-	soil: text(),
-	repotting: text(),
-	maintenance: text(),
-	insideBox: text().array().default(["RAY"]),
-	benefits: text().array().default(["RAY"]),
-	spiritualUseCase: text().array().default(["RAY"]),
-	bestForEmotion: text().array().default(["RAY"]),
-	bestGiftFor: text().array().default(["RAY"]),
-	funFacts: text().array().default(["RAY"]),
-	associatedDeity: text().array().default(["RAY"]),
-	godAligned: text().array().default(["RAY"]),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	index("Plants_isFeatured_idx").using("btree", table.isFeatured.asc().nullsLast().op("bool_ops")),
-	index("Plants_isProductActive_idx").using("btree", table.isProductActive.asc().nullsLast().op("bool_ops")),
-	index("Plants_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-]);
 
-export const plantVariants = pgTable("PlantVariants", {
-	variantId: text().primaryKey().notNull(),
-	plantId: text().notNull(),
-	plantSizeId: text().notNull(),
-	colorId: text().notNull(),
-	sku: text().notNull(),
-	isProductActive: boolean().default(true).notNull(),
-	mrp: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
-	notes: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("PlantVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.plantId],
-		foreignColumns: [plants.plantId],
-		name: "PlantVariants_plantId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.colorId],
-		foreignColumns: [color.id],
-		name: "PlantVariants_colorId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.plantSizeId],
-		foreignColumns: [plantSizeProfile.plantSizeId],
-		name: "PlantVariants_plantSizeId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
-
-export const potCategory = pgTable("PotCategory", {
-	categoryId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	description: text(),
-	publicId: text(),
-	mediaUrl: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
 
 // export const customerAddress = pgTable("CustomerAddress", {
 // 	addressId: text().primaryKey().notNull(),
@@ -851,178 +1253,6 @@ export const potCategory = pgTable("PotCategory", {
 // 	}).onUpdate("cascade").onDelete("set null"),
 // ]);
 
-export const potVariantImage = pgTable("PotVariantImage", {
-	id: text().primaryKey().notNull(),
-	potVariantId: text().notNull(),
-	publicId: text().notNull(),
-	mediaUrl: text().notNull(),
-	mediaType: text(),
-	resourceType: text(),
-	isPrimary: boolean().default(false).notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	index("PotVariantImage_potVariantId_idx").using("btree", table.potVariantId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.potVariantId],
-		foreignColumns: [potVariants.potVariantId],
-		name: "PotVariantImage_potVariantId_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-]);
-
-export const plantVariantImage = pgTable("PlantVariantImage", {
-	id: text().primaryKey().notNull(),
-	plantVariantId: text().notNull(),
-	mediaUrl: text().notNull(),
-	publicId: text().notNull(),
-	mediaType: text(),
-	resourceType: text(),
-	isPrimary: boolean().default(false).notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	index("PlantVariantImage_plantVariantId_idx").using("btree", table.plantVariantId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.plantVariantId],
-		foreignColumns: [plantVariants.variantId],
-		name: "PlantVariantImage_plantVariantId_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-]);
-
-export const plantSizeProfile = pgTable(
-  "PlantSizeProfile",
-  {
-    plantSizeId: text("plantSizeId").primaryKey().notNull(),
-    plantId: text("plantId").notNull(),
-    plantSize: text("plantSize").notNull(), // changed `size()` → `text()` since Drizzle has no size type
-    height: numeric("height", { precision: 65, scale: 30 }).notNull(),
-    weight: numeric("weight", { precision: 65, scale: 30 }).notNull(),
-  },
-  (table) => [
-    uniqueIndex("PlantSizeProfile_plantId_plantSize_key", [
-      table.plantId.asc().nullsLast(),
-      table.plantSize.asc().nullsLast(),
-    ]),
-    foreignKey({
-      columns: [table.plantId],
-      foreignColumns: [plants.plantId],
-      name: "PlantSizeProfile_plantId_fkey",
-      onUpdate: "cascade",
-      onDelete: "restrict",
-    }),
-  ]
-);
-
-export const color = pgTable("Color", {
-	id: text().primaryKey().notNull(),
-	name: text().notNull(),
-	hexCode: text().default('#FFFFFF').notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("Color_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
-]);
-
-export const plantCareGuidelines = pgTable("PlantCareGuidelines", {
-	plantCareId: text().primaryKey().notNull(),
-	plantSizeId: text().notNull(),
-	sunlightTypeId: text().notNull(),
-	humidityLevelId: text().notNull(),
-	season: text().notNull(),
-	wateringFrequency: text().notNull(),
-	waterAmountMl: numeric({ precision: 65, scale: 30 }).notNull(),
-	wateringMethod: text().notNull(),
-	recommendedTime: text().notNull(),
-	soilTypes: text().notNull(),
-	preferredSeasons: text().notNull(),
-	careNotes: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("PlantCareGuidelines_plantSizeId_season_key").using("btree", table.plantSizeId.asc().nullsLast().op("text_ops"), table.season.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.plantSizeId],
-		foreignColumns: [plantSizeProfile.plantSizeId],
-		name: "PlantCareGuidelines_plantSizeId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.sunlightTypeId],
-		foreignColumns: [sunlightTypes.sunlightId],
-		name: "PlantCareGuidelines_sunlightTypeId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.humidityLevelId],
-		foreignColumns: [humidityLevel.humidityId],
-		name: "PlantCareGuidelines_humidityLevelId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
-
-export const sunlightTypes = pgTable("SunlightTypes", {
-	sunlightId: text().primaryKey().notNull(),
-	typeName: text().notNull(),
-	mediaUrl: text().notNull(),
-	publicId: text().notNull(),
-	description: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
-export const humidityLevel = pgTable("HumidityLevel", {
-	humidityId: text().primaryKey().notNull(),
-	level: text().notNull(),
-	description: text(),
-	suitableZones: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
-export const plantFertilizerSchedule = pgTable("PlantFertilizerSchedule", {
-	fertilizerScheduleId: text().primaryKey().notNull(),
-	plantSizeId: text().notNull(),
-	fertilizerId: text().notNull(),
-	applicationFrequency: text().notNull(),
-	applicationMethod: text().array().default(["RAY"]),
-	applicationSeason: text().notNull(),
-	applicationTime: text().notNull(),
-	benefits: text().array().default(["RAY"]),
-	dosageAmount: numeric({ precision: 65, scale: 30 }).notNull(),
-	safetyNotes: text().array().default(["RAY"]),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key").using("btree", table.plantSizeId.asc().nullsLast().op("text_ops"), table.fertilizerId.asc().nullsLast().op("text_ops"), table.applicationSeason.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.plantSizeId],
-		foreignColumns: [plantSizeProfile.plantSizeId],
-		name: "PlantFertilizerSchedule_plantSizeId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.fertilizerId],
-		foreignColumns: [fertilizers.fertilizerId],
-		name: "PlantFertilizerSchedule_fertilizerId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
-
-export const fertilizers = pgTable("Fertilizers", {
-	fertilizerId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	type: text().notNull(),
-	composition: text().notNull(),
-	description: text(),
-	caution: text(),
-	isEcoFriendly: boolean().notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
 // export const plantGenericCostComponent = pgTable("PlantGenericCostComponent", {
 // 	componentId: text().primaryKey().notNull(),
 // 	tagPrintingCost: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
@@ -1090,43 +1320,6 @@ export const fertilizers = pgTable("Fertilizers", {
 // 		name: "PotSizeCostComponent_genericCostComponentId_fkey"
 // 	}).onUpdate("cascade").onDelete("restrict"),
 // ]);
-
-export const potMaterial = pgTable("PotMaterial", {
-	materialId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	description: text().notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("PotMaterial_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
-]);
-
-export const tagGroups = pgTable("TagGroups", {
-	groupId: text().primaryKey().notNull(),
-	groupName: text().notNull(),
-	groupDescription: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
-export const tags = pgTable("Tags", {
-	tagId: text().primaryKey().notNull(),
-	groupId: text().notNull(),
-	tagName: text().notNull(),
-	tagDesc: text().notNull(),
-	tagIcon: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	foreignKey({
-		columns: [table.groupId],
-		foreignColumns: [tagGroups.groupId],
-		name: "Tags_groupId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
 
 // export const order = pgTable("Order", {
 // 	orderId: text().primaryKey().notNull(),
@@ -2192,187 +2385,6 @@ export const tags = pgTable("Tags", {
 // 		name: "PhoneVerification_userId_fkey"
 // 	}).onUpdate("cascade").onDelete("set null"),
 // ]);
-
-export const notification = pgTable(
-  "Notification",
-  {
-    id: text("id").primaryKey().notNull(),
-    userId: text("userId").notNull(),
-    title: text("title").notNull(),
-    body: text("body").notNull(),
-    category: notificationCategory("category").default("GENERAL").notNull(),
-    isRead: boolean("isRead").default(false).notNull(),
-    actionUrl: text("actionUrl"),
-    createdAt: timestamp({ precision: 3, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
-  },
-  (table) => [
-    index("Notification_category_idx", [table.category.asc().nullsLast()]),
-    index("Notification_userId_createdAt_idx", [
-      table.userId.asc().nullsLast(),
-      table.createdAt.asc().nullsLast(),
-    ]),
-    index("Notification_userId_isRead_idx", [
-      table.userId.asc().nullsLast(),
-      table.isRead.asc().nullsLast(),
-    ]),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.userId],
-      name: "Notification_userId_fkey",
-      onUpdate: "cascade",
-      onDelete: "restrict",
-    }),
-  ]
-);
-
-export const plantCategory = pgTable("PlantCategory", {
-	categoryId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	description: text().notNull(),
-	publicId: text().notNull(),
-	mediaUrl: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
-export const potVariants = pgTable("PotVariants", {
-	potVariantId: text().primaryKey().notNull(),
-	colorId: text().notNull(),
-	potName: text().notNull(),
-	sku: text().notNull(),
-	mrp: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
-	isEcoFriendly: boolean().default(false).notNull(),
-	isPremium: boolean().default(false).notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-	sizeMaterialOptionId: text().notNull(),
-}, (table) => [
-	index("PotVariants_colorId_idx").using("btree", table.colorId.asc().nullsLast().op("text_ops")),
-	uniqueIndex("PotVariants_sizeMaterialOptionId_colorId_key").using("btree", table.sizeMaterialOptionId.asc().nullsLast().op("text_ops"), table.colorId.asc().nullsLast().op("text_ops")),
-	uniqueIndex("PotVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.colorId],
-		foreignColumns: [color.id],
-		name: "PotVariants_colorId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.sizeMaterialOptionId],
-		foreignColumns: [sizeMaterialOption.sizeMaterialOptionId],
-		name: "PotVariants_sizeMaterialOptionId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
-
-export const potSizeProfile = pgTable("PotSizeProfile", {
-	potSizeProfileId: text().primaryKey().notNull(),
-	categoryId: text().notNull(),
-	size: text().notNull(),
-	height: numeric({ precision: 65, scale: 30 }),
-	weight: numeric({ precision: 65, scale: 30 }),
-}, (table) => [
-	index("PotSizeProfile_categoryId_idx").using("btree", table.categoryId.asc().nullsLast().op("text_ops")),
-	uniqueIndex("PotSizeProfile_categoryId_size_key").using("btree", table.categoryId.asc().nullsLast().op("text_ops"), table.size.asc().nullsLast().op("text_ops")),
-	index("PotSizeProfile_size_idx").using("btree", table.size.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.categoryId],
-		foreignColumns: [potCategory.categoryId],
-		name: "PotSizeProfile_categoryId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
-
-export const sizeMaterialOption = pgTable("SizeMaterialOption", {
-	sizeMaterialOptionId: text().primaryKey().notNull(),
-	potSizeProfileId: text().notNull(),
-	materialId: text().notNull(),
-}, (table) => [
-	uniqueIndex("SizeMaterialOption_potSizeProfileId_materialId_key").using("btree", table.potSizeProfileId.asc().nullsLast().op("text_ops"), table.materialId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.potSizeProfileId],
-		foreignColumns: [potSizeProfile.potSizeProfileId],
-		name: "SizeMaterialOption_potSizeProfileId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.materialId],
-		foreignColumns: [potMaterial.materialId],
-		name: "SizeMaterialOption_materialId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-]);
-
-export const productCategories = pgTable("_ProductCategories", {
-	a: text("A").notNull(),
-	b: text("B").notNull(),
-}, (table) => [
-	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.a],
-		foreignColumns: [plantCategory.categoryId],
-		name: "_ProductCategories_A_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	foreignKey({
-		columns: [table.b],
-		foreignColumns: [plants.plantId],
-		name: "_ProductCategories_B_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	primaryKey({ columns: [table.a, table.b], name: "_ProductCategories_AB_pkey" }),
-]);
-
-export const compatiblePots = pgTable("_CompatiblePots", {
-	a: text("A").notNull(),
-	b: text("B").notNull(),
-}, (table) => [
-	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.a],
-		foreignColumns: [plantSizeProfile.plantSizeId],
-		name: "_CompatiblePots_A_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	foreignKey({
-		columns: [table.b],
-		foreignColumns: [potVariants.potVariantId],
-		name: "_CompatiblePots_B_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	primaryKey({ columns: [table.a, table.b], name: "_CompatiblePots_AB_pkey" }),
-]);
-
-export const plantVariantToTags = pgTable("_PlantVariantToTags", {
-	a: text("A").notNull(),
-	b: text("B").notNull(),
-}, (table) => [
-	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.a],
-		foreignColumns: [plantVariants.variantId],
-		name: "_PlantVariantToTags_A_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	foreignKey({
-		columns: [table.b],
-		foreignColumns: [tags.tagId],
-		name: "_PlantVariantToTags_B_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	primaryKey({ columns: [table.a, table.b], name: "_PlantVariantToTags_AB_pkey" }),
-]);
-
-export const potVariantToTags = pgTable("_PotVariantToTags", {
-	a: text("A").notNull(),
-	b: text("B").notNull(),
-}, (table) => [
-	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.a],
-		foreignColumns: [potVariants.potVariantId],
-		name: "_PotVariantToTags_A_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	foreignKey({
-		columns: [table.b],
-		foreignColumns: [tags.tagId],
-		name: "_PotVariantToTags_B_fkey"
-	}).onUpdate("cascade").onDelete("cascade"),
-	primaryKey({ columns: [table.a, table.b], name: "_PotVariantToTags_AB_pkey" }),
-]);
 
 // export const rolePermission = pgTable("RolePermission", {
 // 	roleId: text().notNull(),
