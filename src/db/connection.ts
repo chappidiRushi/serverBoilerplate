@@ -1,9 +1,8 @@
 // src/db/index.ts
-import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import { config } from '../config/env';
-import * as schema from './schema';
-import * as relations from './relations';
+import * as schema from './schemas/schema';
 
 // Create PostgreSQL client
 const client = postgres(config.DATABASE_URL, {

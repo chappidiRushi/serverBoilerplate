@@ -1,10 +1,26 @@
 import { relations } from "drizzle-orm/relations";
 import {
-	warehouse, plants, plantVariants, potCategory, potVariants, color, plantSizeProfile,
-	potVariantImage, plantVariantImage, plantCareGuidelines, sunlightTypes, humidityLevel,
-	plantFertilizerSchedule, fertilizers, tagGroups, tags, notification, sizeMaterialOption,
-	potSizeProfile, potMaterial, plantCategory, productCategories, compatiblePots,
-	plantVariantToTags, potVariantToTags,
+	compatiblePots,
+	fertilizers,
+	humidityLevel,
+	plantCareGuidelines,
+	plantCategory,
+	plantFertilizerSchedule,
+	plants,
+	plantSizeProfile,
+	plantVariantImage,
+	plantVariants,
+	plantVariantToTags,
+	potCategory,
+	potMaterial,
+	potSizeProfile,
+	potVariantImage,
+	potVariants,
+	potVariantToTags,
+	productCategories,
+	sizeMaterialOption,
+	sunlightTypes,
+	tagGroups, tags
 } from "./schema";
 
 export const sizeMaterialOptionRelations = relations(sizeMaterialOption, ({ one, many }) => ({

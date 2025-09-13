@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { sql } from "drizzle-orm"
-import { boolean, char, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core"
+import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core"
 
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
@@ -103,23 +103,23 @@ export const potCategory = pgTable("PotCategory", {
 
 
 export const serialTracker = pgTable(
-  "SerialTracker",
-  {
-    id: serial("id").primaryKey().notNull(),
-    entityCode: text("entityCode").notNull(),
-    year: integer("year").notNull(),
-    lastSerial: integer("lastSerial").default(0).notNull(),
-    createdAt: timestamp({ precision: 3, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
-  },
-  (table) => [
-    uniqueIndex("SerialTracker_entityCode_year_key", [
-      table.entityCode.asc().nullsLast(),
-      table.year.asc().nullsLast(),
-    ]),
-  ]
+	"SerialTracker",
+	{
+		id: serial("id").primaryKey().notNull(),
+		entityCode: text("entityCode").notNull(),
+		year: integer("year").notNull(),
+		lastSerial: integer("lastSerial").default(0).notNull(),
+		createdAt: timestamp({ precision: 3, mode: "string" })
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
+		updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+	},
+	(table) => [
+		uniqueIndex("SerialTracker_entityCode_year_key", [
+			table.entityCode.asc().nullsLast(),
+			table.year.asc().nullsLast(),
+		]),
+	]
 );
 
 export const warehouse = pgTable("Warehouse", {
@@ -175,27 +175,27 @@ export const plantVariantImage = pgTable("PlantVariantImage", {
 ]);
 
 export const plantSizeProfile = pgTable(
-  "PlantSizeProfile",
-  {
-    plantSizeId: text("plantSizeId").primaryKey().notNull(),
-    plantId: text("plantId").notNull(),
-    plantSize: text("plantSize").notNull(), // changed `size()` → `text()` since Drizzle has no size type
-    height: numeric("height", { precision: 65, scale: 30 }).notNull(),
-    weight: numeric("weight", { precision: 65, scale: 30 }).notNull(),
-  },
-  (table) => [
-    uniqueIndex("PlantSizeProfile_plantId_plantSize_key", [
-      table.plantId.asc().nullsLast(),
-      table.plantSize.asc().nullsLast(),
-    ]),
-    foreignKey({
-      columns: [table.plantId],
-      foreignColumns: [plants.plantId],
-      name: "PlantSizeProfile_plantId_fkey",
-      onUpdate: "cascade",
-      onDelete: "restrict",
-    }),
-  ]
+	"PlantSizeProfile",
+	{
+		plantSizeId: text("plantSizeId").primaryKey().notNull(),
+		plantId: text("plantId").notNull(),
+		plantSize: text("plantSize").notNull(), // changed `size()` → `text()` since Drizzle has no size type
+		height: numeric("height", { precision: 65, scale: 30 }).notNull(),
+		weight: numeric("weight", { precision: 65, scale: 30 }).notNull(),
+	},
+	(table) => [
+		uniqueIndex("PlantSizeProfile_plantId_plantSize_key", [
+			table.plantId.asc().nullsLast(),
+			table.plantSize.asc().nullsLast(),
+		]),
+		foreignKey({
+			columns: [table.plantId],
+			foreignColumns: [plants.plantId],
+			name: "PlantSizeProfile_plantId_fkey",
+			onUpdate: "cascade",
+			onDelete: "restrict",
+		}),
+	]
 );
 
 export const color = pgTable("Color", {
@@ -346,38 +346,38 @@ export const tags = pgTable("Tags", {
 
 
 export const notification = pgTable(
-  "Notification",
-  {
-    id: text("id").primaryKey().notNull(),
-    userId: text("userId").notNull(),
-    title: text("title").notNull(),
-    body: text("body").notNull(),
-    category: notificationCategory("category").default("GENERAL").notNull(),
-    isRead: boolean("isRead").default(false).notNull(),
-    actionUrl: text("actionUrl"),
-    createdAt: timestamp({ precision: 3, mode: "string" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
-  },
-  (table) => [
-    index("Notification_category_idx", [table.category.asc().nullsLast()]),
-    index("Notification_userId_createdAt_idx", [
-      table.userId.asc().nullsLast(),
-      table.createdAt.asc().nullsLast(),
-    ]),
-    index("Notification_userId_isRead_idx", [
-      table.userId.asc().nullsLast(),
-      table.isRead.asc().nullsLast(),
-    ]),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.userId],
-      name: "Notification_userId_fkey",
-      onUpdate: "cascade",
-      onDelete: "restrict",
-    }),
-  ]
+	"Notification",
+	{
+		id: text("id").primaryKey().notNull(),
+		userId: text("userId").notNull(),
+		title: text("title").notNull(),
+		body: text("body").notNull(),
+		category: notificationCategory("category").default("GENERAL").notNull(),
+		isRead: boolean("isRead").default(false).notNull(),
+		actionUrl: text("actionUrl"),
+		createdAt: timestamp({ precision: 3, mode: "string" })
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
+		updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+	},
+	(table) => [
+		index("Notification_category_idx", [table.category.asc().nullsLast()]),
+		index("Notification_userId_createdAt_idx", [
+			table.userId.asc().nullsLast(),
+			table.createdAt.asc().nullsLast(),
+		]),
+		index("Notification_userId_isRead_idx", [
+			table.userId.asc().nullsLast(),
+			table.isRead.asc().nullsLast(),
+		]),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.userId],
+			name: "Notification_userId_fkey",
+			onUpdate: "cascade",
+			onDelete: "restrict",
+		}),
+	]
 );
 
 export const plantCategory = pgTable("PlantCategory", {
@@ -526,6 +526,53 @@ export const potVariantToTags = pgTable("_PotVariantToTags", {
 	primaryKey({ columns: [table.a, table.b], name: "_PotVariantToTags_AB_pkey" }),
 ]);
 
+
+export const user = pgTable("User", {
+	userId: text().primaryKey().notNull(),
+	// roleId: text().notNull(),
+	fullName: jsonb().notNull(),
+	phoneNumber: text(),
+	email: text().notNull(),
+	password: text().notNull(),
+	isActive: boolean().default(true).notNull(),
+	profileImageUrl: text(),
+	publicId: text(),
+	phoneVerified: boolean().default(false).notNull(),
+	emailVerified: boolean().default(false).notNull(),
+	address: jsonb(),
+	deactivationReason: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+}, (table) => [
+	uniqueIndex("User_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("User_phoneNumber_email_idx").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops"), table.email.asc().nullsLast().op("text_ops")),
+	uniqueIndex("User_phoneNumber_key").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops")),
+	index("User_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	// foreignKey({
+	// 	columns: [table.roleId],
+	// 	foreignColumns: [role.roleId],
+	// 	name: "User_roleId_fkey"
+	// }).onUpdate("cascade").onDelete("restrict"),
+]);
+// export const role = pgTable("Role", {
+// 	roleId: text().primaryKey().notNull(),
+// 	role: text().notNull(),
+// 	// addedByUserId: text(),
+// 	addedByType: addedByType().default('SYSTEM').notNull(),
+// 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+// 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+// 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+// }, (table) => [
+// 	uniqueIndex("Role_role_key").using("btree", table.role.asc().nullsLast().op("text_ops")),
+// 	foreignKey({
+// 		columns: [table.addedByUserId],
+// 		foreignColumns: [user.userId],
+// 		name: "Role_addedByUserId_fkey"
+// 	}).onUpdate("cascade").onDelete("set null"),
+// ]);
+
+
 // export const deliveryCharge = pgTable("DeliveryCharge", {
 // 	id: text().primaryKey().notNull(),
 // 	pinCode: text().notNull(),
@@ -550,51 +597,8 @@ export const potVariantToTags = pgTable("_PotVariantToTags", {
 
 
 
-// export const role = pgTable("Role", {
-// 	roleId: text().primaryKey().notNull(),
-// 	role: text().notNull(),
-// 	addedByUserId: text(),
-// 	addedByType: addedByType().default('SYSTEM').notNull(),
-// 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-// 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-// 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-// }, (table) => [
-// 	uniqueIndex("Role_role_key").using("btree", table.role.asc().nullsLast().op("text_ops")),
-// 	foreignKey({
-// 		columns: [table.addedByUserId],
-// 		foreignColumns: [user.userId],
-// 		name: "Role_addedByUserId_fkey"
-// 	}).onUpdate("cascade").onDelete("set null"),
-// ]);
 
-// export const user = pgTable("User", {
-// 	userId: text().primaryKey().notNull(),
-// 	roleId: text().notNull(),
-// 	fullName: jsonb().notNull(),
-// 	phoneNumber: text(),
-// 	email: text().notNull(),
-// 	password: text().notNull(),
-// 	isActive: boolean().default(true).notNull(),
-// 	profileImageUrl: text(),
-// 	publicId: text(),
-// 	phoneVerified: boolean().default(false).notNull(),
-// 	emailVerified: boolean().default(false).notNull(),
-// 	address: jsonb(),
-// 	deactivationReason: text(),
-// 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-// 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-// 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-// }, (table) => [
-// 	uniqueIndex("User_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
-// 	index("User_phoneNumber_email_idx").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops"), table.email.asc().nullsLast().op("text_ops")),
-// 	uniqueIndex("User_phoneNumber_key").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops")),
-// 	index("User_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-// 	foreignKey({
-// 		columns: [table.roleId],
-// 		foreignColumns: [role.roleId],
-// 		name: "User_roleId_fkey"
-// 	}).onUpdate("cascade").onDelete("restrict"),
-// ]);
+
 
 // export const roleCreationAuditLog = pgTable("RoleCreationAuditLog", {
 // 	logId: text().primaryKey().notNull(),
