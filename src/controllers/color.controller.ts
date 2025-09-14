@@ -19,8 +19,8 @@ export const colorCreate = async function (data: TColorRouteCreate) {
 }
 
 
-export const colorUpdate = async (input: TColorRouteUpdate) => {
-  const { id, name, hexCode } = input;
+export const colorUpdate = async (input: TColorRouteUpdate, id: string) => {
+  const { name, hexCode } = input;
 
   // Check if color exists
   const [existingColor] = await db
@@ -58,4 +58,28 @@ export const colorUpdate = async (input: TColorRouteUpdate) => {
     throw CE.INTERNAL_SERVER_ERROR_500("Failed To Update Color");
 
   return updatedColor;
+};
+
+export const colorDelete = async function (id: string) {
+  // Check if color exists
+  const [existingColor] = await db
+    .select()
+    .from(colorTable)
+    .where(eq(colorTable.id, id))
+    .limit(1);
+
+  if (!existingColor) {
+    throw CE.NOT_FOUND_404(`Color with ID ${id} not found`);
+  }
+
+  // Delete the color
+  const deleted = await db
+    .delete(colorTable)
+    .where(eq(colorTable.id, id));
+
+  if (deleted.length === 0) {
+    throw CE.INTERNAL_SERVER_ERROR_500("Failed to delete color");
+  }
+
+  return { id };
 };

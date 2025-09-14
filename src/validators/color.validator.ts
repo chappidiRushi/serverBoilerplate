@@ -10,7 +10,7 @@ export const ZColorSelectSchema  = createSelectSchema(colorTable);
 
 export const ZColor = ZColorSelectSchema;
 export const ZColorRouteCreate = ZColorInsertSchema.pick({ hexCode: true, name: true });
-export const ZColorRouteUpdate = ZColorRouteCreate.partial().extend({ id: ZColorInsertSchema.shape.id, });
+export const ZColorRouteUpdate = ZColorRouteCreate.partial()
 
 export type TColor = z.infer<typeof ZColor>
 export type TColorRouteCreate = z.infer<typeof ZColorRouteCreate>

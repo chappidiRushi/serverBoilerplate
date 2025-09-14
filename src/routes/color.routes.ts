@@ -1,15 +1,21 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { colorCreate, colorUpdate } from "../controllers/color.controller";
+import z from "zod";
+import { colorCreate, colorDelete, colorUpdate } from "../controllers/color.controller";
 import { ErrorCommonSchemas, SuccessResponseSchema } from "../utils/response";
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "../validators/color.validator";
 
 
+
+const ZId = z.object({
+  id: z.string()
+})
+
 export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post(
-    "/crate",
+    "/",
     {
       schema: {
-        summary: "Create Add",
+        summary: "Color Create",
         body: ZColorRouteCreate,
         response: {
           201: SuccessResponseSchema(ZColor),
@@ -24,11 +30,12 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
       return reply.success(newColor, 201, "Color Created Successfully");
     }
   );
-  fastify.post(
-    "/update",
+  fastify.patch(
+    "/:id",
     {
       schema: {
-        summary: "User Login",
+        params: ZId,
+        summary: "Color Update",
         body: ZColorRouteUpdate,
         response: {
           200: SuccessResponseSchema(ZColor),
@@ -39,9 +46,30 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (req, reply) => {
       // const replyData = await UserLogin(req.body, reply);
-      const updatedColor = await colorUpdate(req.body)
+      const id = req.params.id
+      const updatedColor = await colorUpdate(req.body, id)
       // // logger.info("user crated", newUser);
-      return reply.success(updatedColor, 200, "Color Update Successfully");
+      return reply.success(updatedColor, 200, "Color Updated Successfully");
+    }
+  );
+  fastify.delete(
+    "/:id",
+    {
+      schema: {
+        params: ZId,
+        summary: "Color Delete",
+        // body: ZColorRouteUpdate,
+        response: {
+          200: SuccessResponseSchema(ZId),
+          400: ErrorCommonSchemas["400"],
+          500: ErrorCommonSchemas["500"],
+        },
+      },
+    },
+    async (req, reply) => {
+      const id = req.params.id;
+      const deleted = colorDelete(id);
+      return reply.success(deleted, 200, "Color Update Successfully");
     }
   );
 };
