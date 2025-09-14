@@ -10,15 +10,38 @@
     "skipLibCheck": true,
     "baseUrl": "src",
     "paths": {
-      "@config/*": ["config/*"],
-      "@routes/*": ["routes/*"],
-      "@plugins/*": ["plugins/*"],
-      "@middleware/*": ["middleware/*"],
-      "@utils/*": ["utils/*"],
-      "@schemas/*": ["schemas/*"]
+      "@config/*": [
+        "config/*"
+      ],
+      "@routes/*": [
+        "routes/*"
+      ],
+      "@plugins/*": [
+        "plugins/*"
+      ],
+      "@middleware/*": [
+        "middleware/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@schemas/*": [
+        "schemas/*"
+      ],
+      "@validators/*": [
+        "validators/*"
+      ],
     },
-    "types": ["bun-types", "node"]
+    "types": [
+      "bun-types",
+      "node"
+    ]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

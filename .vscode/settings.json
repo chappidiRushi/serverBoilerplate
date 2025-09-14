@@ -17,5 +17,25 @@
     "pkey",
     "repotting"
   ],
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#3af96a",
+    "activityBar.background": "#3af96a",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#a183fb",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#3af96a",
+    "statusBar.background": "#08f844",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#06c736",
+    "statusBarItem.remoteBackground": "#08f844",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#08f844",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#08f84499",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#08f844",
   // "typescript.tsdk": "node_modules/typescript/lib"
 }

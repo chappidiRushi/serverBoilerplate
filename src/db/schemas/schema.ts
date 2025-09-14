@@ -372,7 +372,7 @@ export const notification = pgTable(
 		]),
 		foreignKey({
 			columns: [table.userId],
-			foreignColumns: [user.userId],
+			foreignColumns: [userTable.userId],
 			name: "Notification_userId_fkey",
 			onUpdate: "cascade",
 			onDelete: "restrict",
@@ -527,10 +527,10 @@ export const potVariantToTags = pgTable("_PotVariantToTags", {
 ]);
 
 
-export const user = pgTable("User", {
+export const userTable = pgTable("user", {
 	userId: text().primaryKey().notNull(),
 	// roleId: text().notNull(),
-	fullName: jsonb().notNull(),
+	fullName: text().notNull(),
 	phoneNumber: text(),
 	email: text().notNull(),
 	password: text().notNull(),

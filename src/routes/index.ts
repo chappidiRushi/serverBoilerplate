@@ -1,6 +1,7 @@
 import { type FastifyInstance } from "fastify";
 import { config } from "../config/env";
 import { productRoutes } from "./product.routes";
+import { userRoutes } from "./user.routes";
 
 export async function RegisterRoutes(fastify: FastifyInstance) {
   fastify.get('/health', async (request, reply) => {
@@ -18,4 +19,5 @@ export async function RegisterRoutes(fastify: FastifyInstance) {
   // API routes
   // await fastify.register(authRoutes, { prefix: '/api/auth' });
   await fastify.register(productRoutes, { prefix: '/api/product' });
+  await fastify.register(userRoutes, { prefix: '/api/user' });
 }
