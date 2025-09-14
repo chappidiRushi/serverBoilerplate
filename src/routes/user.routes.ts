@@ -1,0 +1,95 @@
+import { UserRouteCreateSchema, UserSelectSchema } from "@validators/user.validator";
+import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { createUser } from "../controllers/user.controller";
+import { logger } from "../utils/logger";
+import { SuccessResponseSchema } from "../utils/response";
+
+
+export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
+  fastify.post(
+    "/",
+    {
+      schema: {
+        summary: "Create Product",
+        body: UserRouteCreateSchema,
+        response: { 201: SuccessResponseSchema(UserSelectSchema.omit({ password: true })) },
+      },
+    },
+    async (req, reply) => {
+      const newUser = await createUser(req.body);
+      logger.info("user crated", newUser);
+      return reply.success(newUser, 201, "Product created successfully");
+    }
+  );
+
+  // Get All Products
+  // fastify.get(
+  //   "/",
+  //   {
+  //     schema: {
+  //       summary: "Get All Products",
+  //       response: {
+  //         200: SuccessResponseSchema(z.array(ProductSchema)),
+  //         ...CommonErrorSchema
+  //       },
+  //     },
+  //   },
+  //   async (req, reply) => {
+  //     // throw CE.BAD_REQUEST_400("This is a simulated Error")
+  //     return reply.success(products, 200, "Products retrieved successfully");
+  //   }
+  // );
+
+  // // Get Product by ID
+  // fastify.get(
+  //   "/:id",
+  //   {
+  //     schema: {
+  //       summary: "Get Product by ID",
+  //       params: z.object({ id: z.string().uuid() }),
+  //       response: { 200: SuccessResponseSchema(ProductSchema) },
+  //     },
+  //   },
+  //   async (req, reply) => {
+  //     const product = products.find((p) => p.id === req.params.id);
+  //     // if (!product) return reply.code(404).send({ message: "Product not found" });
+  //     return reply.success(product, 201, "Product retrieved successfully");
+  //   }
+  // );
+
+  // // Update Product
+  // fastify.put(
+  //   "/:id",
+  //   {
+  //     schema: {
+  //       summary: "Update Product",
+  //       params: z.object({ id: z.string().uuid() }),
+  //       body: UpdateProductSchema,
+  //       response: { 200: SuccessResponseSchema(ProductSchema) },
+  //     },
+  //   },
+  //   async (req, reply) => {
+  //     const index = products.findIndex((p) => p.id === req.params.id);
+  //     // if (index === -1) return reply.code(404).send({ message: "Product not found" });
+
+  //     products[index] = { ...products[index], ...req.body } as any;
+  //     return reply.success(products[index], 200, "Product updated successfully");
+  //   }
+  // );
+
+  // // Delete Product
+  // fastify.delete(
+  //   "/:id",
+  //   {
+  //     schema: {
+  //       summary: "Delete Product",
+  //       params: z.object({ id: z.string().uuid() }),
+  //       response: { 200: SuccessResponseSchema(z.object({ message: z.string() })) },
+  //     },
+  //   },
+  //   async (req, reply) => {
+  //     products = products.filter((p) => p.id !== req.params.id);
+  //     return reply.success({ message: "Product deleted successfully" }, 200, "Product deleted");
+  //   }
+  // );
+};
