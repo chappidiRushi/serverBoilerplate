@@ -1,6 +1,6 @@
+import { userTable } from "db/schemas/user.schema";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
-import { userTable } from "../db/schemas/schema";
 
 
 

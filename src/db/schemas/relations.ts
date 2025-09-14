@@ -1,4 +1,5 @@
 import { relations } from "drizzle-orm/relations";
+import { colorTable } from "./color.schema";
 import {
 	compatiblePots,
 	fertilizers,
@@ -13,7 +14,6 @@ import {
 	plantVariantToTags,
 	potCategory,
 	potMaterial,
-	color,
 	potSizeProfile,
 	potVariantImage,
 	potVariants,
@@ -494,7 +494,7 @@ export const tagGroupsRelations = relations(tagGroups, ({ many }) => ({
 // 	}),
 // }));
 
-export const plantsRelations = relations(plants, ({many}) => ({
+export const plantsRelations = relations(plants, ({ many }) => ({
 	// notifyMeSubscriptions: many(notifyMeSubscription),
 	plantVariants: many(plantVariants),
 	// plantCartItems: many(plantCartItem),
@@ -520,15 +520,15 @@ export const plantsRelations = relations(plants, ({many}) => ({
 	productCategories: many(productCategories),
 }));
 
-export const plantVariantsRelations = relations(plantVariants, ({one, many}) => ({
+export const plantVariantsRelations = relations(plantVariants, ({ one, many }) => ({
 	// notifyMeSubscriptions: many(notifyMeSubscription),
 	plant: one(plants, {
 		fields: [plantVariants.plantId],
 		references: [plants.plantId]
 	}),
-	color: one(color, {
+	color: one(colorTable, {
 		fields: [plantVariants.colorId],
-		references: [color.id]
+		references: [colorTable.id]
 	}),
 	plantSizeProfile: one(plantSizeProfile, {
 		fields: [plantVariants.plantSizeId],
@@ -551,7 +551,7 @@ export const plantVariantsRelations = relations(plantVariants, ({one, many}) => 
 	plantVariantToTags: many(plantVariantToTags),
 }));
 
-export const potCategoryRelations = relations(potCategory, ({many}) => ({
+export const potCategoryRelations = relations(potCategory, ({ many }) => ({
 	// notifyMeSubscriptions: many(notifyMeSubscription),
 	// potCartItems: many(potCartItem),
 	// potCheckoutLaters: many(potCheckoutLater),
@@ -569,7 +569,7 @@ export const potCategoryRelations = relations(potCategory, ({many}) => ({
 	potSizeProfiles: many(potSizeProfile),
 }));
 
-export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
+export const potVariantsRelations = relations(potVariants, ({ one, many }) => ({
 	// notifyMeSubscriptions: many(notifyMeSubscription),
 	// potCartItems: many(potCartItem),
 	// potCheckoutLaters: many(potCheckoutLater),
@@ -585,9 +585,9 @@ export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
 	// potRestockEventLogs: many(potRestockEventLog),
 	// warehouseCartItems: many(warehouseCartItem),
 	// potSupplierInventories: many(potSupplierInventory),
-	color: one(color, {
+	color: one(colorTable, {
 		fields: [potVariants.colorId],
-		references: [color.id]
+		references: [colorTable.id]
 	}),
 	sizeMaterialOption: one(sizeMaterialOption, {
 		fields: [potVariants.sizeMaterialOptionId],
@@ -597,12 +597,12 @@ export const potVariantsRelations = relations(potVariants, ({one, many}) => ({
 	potVariantToTags: many(potVariantToTags),
 }));
 
-export const colorRelations = relations(color, ({many}) => ({
+export const colorRelations = relations(colorTable, ({ many }) => ({
 	plantVariants: many(plantVariants),
 	potVariants: many(potVariants),
 }));
 
-export const plantSizeProfileRelations = relations(plantSizeProfile, ({one, many}) => ({
+export const plantSizeProfileRelations = relations(plantSizeProfile, ({ one, many }) => ({
 	plantVariants: many(plantVariants),
 	plant: one(plants, {
 		fields: [plantSizeProfile.plantId],

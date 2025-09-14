@@ -1,7 +1,7 @@
 import { TUserRouteCreate, TUserRouteLogin } from "@validators/user.validator";
+import { userTable } from "db/schemas/user.schema";
 import { eq } from 'drizzle-orm';
 import { FastifyReply } from "fastify/types/reply";
-import { userTable } from "../db/schemas/schema";
 import { comparePassword, hashPassword } from "../utils/auth";
 
 
@@ -50,7 +50,7 @@ export const UserLogin = async function (payload: TUserRouteLogin, reply: Fastif
     .from(userTable)
     .where(eq(userTable.email, email))
     .limit(1);
-    if (!user) throw CE.BAD_REQUEST_400(`No User With Email:${email} Found`)
+  if (!user) throw CE.BAD_REQUEST_400(`No User With Email:${email} Found`)
 
   const isValidPassword = await comparePassword(password, user.password);
   if (!isValidPassword) throw CE.BAD_REQUEST_400("Invalid Password");

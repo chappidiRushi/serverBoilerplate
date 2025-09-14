@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { sql } from "drizzle-orm"
 import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core"
+import { colorTable } from "./color.schema"
 
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
@@ -80,7 +81,7 @@ export const plantVariants = pgTable("PlantVariants", {
 	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
 		columns: [table.colorId],
-		foreignColumns: [color.id],
+		foreignColumns: [colorTable.id],
 		name: "PlantVariants_colorId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
@@ -197,17 +198,6 @@ export const plantSizeProfile = pgTable(
 		}),
 	]
 );
-
-export const color = pgTable("Color", {
-	id: text().primaryKey().notNull(),
-	name: text().notNull(),
-	hexCode: text().default('#FFFFFF').notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("Color_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
-]);
 
 export const plantCareGuidelines = pgTable("PlantCareGuidelines", {
 	plantCareId: text().primaryKey().notNull(),
@@ -409,7 +399,7 @@ export const potVariants = pgTable("PotVariants", {
 	uniqueIndex("PotVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
 	foreignKey({
 		columns: [table.colorId],
-		foreignColumns: [color.id],
+		foreignColumns: [colorTable.id],
 		name: "PotVariants_colorId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
@@ -555,6 +545,15 @@ export const userTable = pgTable("user", {
 	// 	name: "User_roleId_fkey"
 	// }).onUpdate("cascade").onDelete("restrict"),
 ]);
+
+
+
+
+
+
+
+
+
 // export const role = pgTable("Role", {
 // 	roleId: text().primaryKey().notNull(),
 // 	role: text().notNull(),
