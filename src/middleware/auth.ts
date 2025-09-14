@@ -8,12 +8,6 @@ export interface AuthenticatedUser {
   lastName?: string;
 }
 
-declare module 'fastify' {
-  interface FastifyRequest {
-    user?: AuthenticatedUser;
-    requestId?: string;
-  }
-}
 
 // export const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
 //   const token = request.headers.authorization?.replace('Bearer ', '');

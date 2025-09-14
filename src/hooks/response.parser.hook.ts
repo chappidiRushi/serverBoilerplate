@@ -7,14 +7,16 @@ declare module 'fastify' {
   interface FastifyReply {
     success<T>(data: T, statusCode: number, message?: string): FastifyReply;
   }
+}
+
+declare module "fastify" {
   interface FastifyRequest {
-    requestId: string
+    requestId: string; // now required
   }
 }
 
 export const onRequestHook = async (request: FastifyRequest, reply: FastifyReply) => {
   request.requestId = generateRequestId();
-
   reply.success = function <T>(data: T, statusCode: number, message = 'Success'): FastifyReply {
     const response = {
       status: 'success' as const,

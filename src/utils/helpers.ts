@@ -12,8 +12,3 @@ export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
-
-export const sanitizeUser = (user: any) => {
-  const { password, ...sanitized } = user;
-  return sanitized;
-};

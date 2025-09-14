@@ -1,7 +1,7 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { CommonErrorSchema, SuccessResponseSchema } from "../utils/response";
 import { TestME } from "../utils/auth";
+import { ErrorCommonSchemas, SuccessResponseSchema } from "../utils/response";
 
 export const ProductSchema = z.object({
   id: z.string().uuid(),
@@ -42,7 +42,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Get All Products",
         response: {
           200: SuccessResponseSchema(z.array(ProductSchema)),
-          ...CommonErrorSchema
+          ...ErrorCommonSchemas
         },
       },
     },

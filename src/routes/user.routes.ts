@@ -1,24 +1,50 @@
-import { UserRouteCreateSchema, UserSelectSchema } from "@validators/user.validator";
+import { UserRouteCreateSchema, UserRouteLoginReply, UserRouteLoginReq, UserSelectSchema } from "@validators/user.validator";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { createUser } from "../controllers/user.controller";
+import { UserCreate, UserLogin } from "../controllers/user.controller";
 import { logger } from "../utils/logger";
-import { SuccessResponseSchema } from "../utils/response";
+import { ErrorCommonSchemas, SuccessResponseSchema } from "../utils/response";
 
 
 export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post(
-    "/",
+    "/register",
     {
       schema: {
-        summary: "Create Product",
+        summary: "User Registration",
         body: UserRouteCreateSchema,
-        response: { 201: SuccessResponseSchema(UserSelectSchema.omit({ password: true })) },
+        response: {
+          201: SuccessResponseSchema(UserSelectSchema.omit({ password: true })),
+          400: ErrorCommonSchemas["400"],
+          500: ErrorCommonSchemas["500"],
+        },
       },
     },
     async (req, reply) => {
-      const newUser = await createUser(req.body);
+      const newUser = await UserCreate(req.body);
       logger.info("user crated", newUser);
-      return reply.success(newUser, 201, "Product created successfully");
+      return reply.success(newUser, 201, "User Registration Completed Successfully");
+    }
+  );
+
+
+  fastify.post(
+    "/login",
+    {
+      schema: {
+        summary: "User Login",
+        body: UserRouteLoginReq,
+        response: {
+          200: SuccessResponseSchema(UserRouteLoginReply),
+          400: ErrorCommonSchemas["400"],
+          500: ErrorCommonSchemas["500"],
+        },
+      },
+    },
+    async (req, reply) => {
+      const replyData = await UserLogin(req.body, reply);
+
+      // logger.info("user crated", newUser);
+      return reply.success(replyData, 200, "Login Successfully");
     }
   );
 
@@ -36,7 +62,7 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
   //   },
   //   async (req, reply) => {
   //     // throw CE.BAD_REQUEST_400("This is a simulated Error")
-  //     return reply.success(products, 200, "Products retrieved successfully");
+  //     return reply.success(roducts, 200, "Products retrieved successfully");
   //   }
   // );
 
