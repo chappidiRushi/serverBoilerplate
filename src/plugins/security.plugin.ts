@@ -4,7 +4,7 @@ import helmet from '@fastify/helmet';
 import jwt from '@fastify/jwt';
 import rateLimit from '@fastify/rate-limit';
 import { type FastifyInstance } from 'fastify';
-import { config } from '../config/env';
+import { config } from '../config/env.config';
 
 
 export async function SecurityPlugin(fastify: FastifyInstance) {

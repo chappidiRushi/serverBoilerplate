@@ -1,15 +1,13 @@
-import './config/globals';
+import './config/globals.config';
 
 import Fastify from 'fastify';
 import { type ZodTypeProvider } from 'fastify-type-provider-zod';
-import { config } from './config/env';
+import { config } from './config/env.config';
+import { logger } from './config/logger.config';
 import { RegisterHooks } from './hooks';
-import { errorHandler } from './middleware/errorHandler';
+import { errorHandler } from './middleware/errorHandler.middleware';
 import { RegisterPlugins } from './plugins';
 import { RegisterRoutes } from './routes';
-import { logger } from './utils/logger';
-import { setupShutdown } from './utils/shutdown';
-
 
 const fastify = Fastify({ logger: false, }).withTypeProvider<ZodTypeProvider>();
 fastify.setErrorHandler(errorHandler);
@@ -38,5 +36,4 @@ const start = async () => {
 };
 
 // Graceful shutdown
-setupShutdown(fastify);
 start();

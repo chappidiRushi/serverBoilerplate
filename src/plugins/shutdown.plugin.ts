@@ -1,7 +1,7 @@
 import { type FastifyInstance } from "fastify";
-import { logger } from "./logger";
+import { logger } from "../config/logger.config";
 
-export function setupShutdown(fastify: FastifyInstance) {
+export function RegisterShutdown(fastify: FastifyInstance) {
   const gracefulShutdown = async (signal: string) => {
     logger.info(`Received ${signal}, shutting down gracefully...`);
     try {

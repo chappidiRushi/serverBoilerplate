@@ -17,7 +17,7 @@ export interface AuthenticatedUser {
 //   }
 
 //   try {
-//     const decoded = await request.server.jwt.verify(token) as AuthenticatedUser;
+//     const decoded = await request.server.jwt.verify(token) as AuthenticatedUser;auth
 //     request.user = decoded;
 //   } catch (err) {
 //     throw new Errors.AuthenticationError('Invalid or expired token');

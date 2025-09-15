@@ -1,6 +1,6 @@
 import { db, type Database } from '../db/connection';
-import { err } from '../utils/errors';
-import { config } from './env';
+import { err } from '../utils/errors.util';
+import { config } from './env.config';
 declare global {
   // Add all your globals here
   var APP_CONFIG: typeof config;

@@ -1,5 +1,5 @@
 import { type FastifyReply, type FastifyRequest } from 'fastify';
-import { logger } from '../utils/logger';
+import { logger } from '../config/logger.config';
 
 export const requestLogger = async (request: FastifyRequest, reply: FastifyReply) => {
   const startTime = process.hrtime();

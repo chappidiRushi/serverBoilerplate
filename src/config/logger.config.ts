@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { config } from '../config/env';
+import { config } from './env.config';
 
 const logSymbols: Record<string, string> = {
   error: '❌',

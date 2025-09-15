@@ -8,7 +8,7 @@ export class HttpError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
-HttpError
+
 // Hardcoded errors with numbers at the end
 export const err = {
   // 4xx Client Errors
@@ -55,7 +55,3 @@ export const err = {
   NOT_EXTENDED_510: (msg?: any) => new HttpError(510, msg || "Not Extended"),
   NETWORK_AUTHENTICATION_REQUIRED_511: (msg?: any) => new HttpError(511, msg || "Network Authentication Required"),
 };
-
-// Usage
-// throw err.NOT_FOUND_404("Resource not found");
-// throw err.BAD_REQUEST_400(); // default message

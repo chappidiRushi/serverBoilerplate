@@ -7,9 +7,3 @@ export const hashPassword = async (plainPassword: string): Promise<string> => {
 export const comparePassword = async (plainPassword: string, hash: string): Promise<boolean> => {
   return password.verify(plainPassword, hash);
 };
-
-
-export function TestME() {
-  console.log("yep tested");
-
-}

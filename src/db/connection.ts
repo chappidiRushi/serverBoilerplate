@@ -1,7 +1,7 @@
 // src/db/index.ts
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { config } from '../config/env';
+import { config } from '../config/env.config';
 import * as schema from './schemas/schema';
 
 // Create PostgreSQL client

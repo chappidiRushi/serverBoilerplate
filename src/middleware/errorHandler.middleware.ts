@@ -1,9 +1,9 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
+import { config } from '../config/env.config';
+import { logger } from '../config/logger.config';
 import { HTTP_STATUS } from '../constants/constants';
-import { config } from '../config/env';
-import { HttpError } from '../utils/errors';
-import { logger } from '../utils/logger';
+import { HttpError } from '../utils/errors.util';
 
 type ErrorResponse = {
   success: false;

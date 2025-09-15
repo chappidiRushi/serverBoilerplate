@@ -1,7 +1,7 @@
 import { UserRouteCreateSchema, UserRouteLoginReply, UserRouteLoginReq, UserSelectSchema } from "components/user/user.validator";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { logger } from "../../utils/logger";
-import { ErrorCommonSchemas, SuccessResponseSchema } from "../../utils/response";
+import { logger } from "../../config/logger.config";
+import { ErrorCommonSchemas, ZSuccessResponse } from "../../utils/zod.util";
 import { UserCreate, UserLogin } from "./user.controller";
 
 
@@ -13,7 +13,7 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "User Registration",
         body: UserRouteCreateSchema,
         response: {
-          201: SuccessResponseSchema(UserSelectSchema.omit({ password: true })),
+          201: ZSuccessResponse(UserSelectSchema.omit({ password: true })),
           400: ErrorCommonSchemas["400"],
           500: ErrorCommonSchemas["500"],
         },
@@ -34,7 +34,7 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "User Login",
         body: UserRouteLoginReq,
         response: {
-          200: SuccessResponseSchema(UserRouteLoginReply),
+          200: ZSuccessResponse(UserRouteLoginReply),
           400: ErrorCommonSchemas["400"],
           500: ErrorCommonSchemas["500"],
         },

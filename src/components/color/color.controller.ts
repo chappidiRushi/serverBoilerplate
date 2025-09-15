@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { colorTable } from "../../db/schemas/color.schema";
-import { now } from "../../utils/helpers";
+import { now } from "../../utils/helpers.util";
 import { TColorRouteCreate, TColorRouteUpdate } from "./color.validator";
 
 

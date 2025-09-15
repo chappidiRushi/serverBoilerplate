@@ -2,7 +2,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import { type FastifyInstance } from 'fastify';
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { config } from '../config/env';
+import { config } from '../config/env.config';
 
 export async function SwaggerPlugin(fastify: FastifyInstance) {
   await fastify.register(swagger, {
