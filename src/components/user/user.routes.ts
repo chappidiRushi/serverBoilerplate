@@ -1,7 +1,7 @@
 import { UserRouteCreateSchema, UserRouteLoginReply, UserRouteLoginReq, UserSelectSchema } from "components/user/user.validator";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { logger } from "../../config/logger.config";
-import { ErrorCommonSchemas, ZSuccessResponse } from "../../utils/zod.util";
+import { ZResErrorCommon, ZResOK } from "../../utils/zod.util";
 import { UserCreate, UserLogin } from "./user.controller";
 
 
@@ -13,9 +13,9 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "User Registration",
         body: UserRouteCreateSchema,
         response: {
-          201: ZSuccessResponse(UserSelectSchema.omit({ password: true })),
-          400: ErrorCommonSchemas["400"],
-          500: ErrorCommonSchemas["500"],
+          201: ZResOK(UserSelectSchema.omit({ password: true })),
+          400: ZResErrorCommon["400"],
+          500: ZResErrorCommon["500"],
         },
       },
     },
@@ -34,9 +34,9 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "User Login",
         body: UserRouteLoginReq,
         response: {
-          200: ZSuccessResponse(UserRouteLoginReply),
-          400: ErrorCommonSchemas["400"],
-          500: ErrorCommonSchemas["500"],
+          200: ZResOK(UserRouteLoginReply),
+          400: ZResErrorCommon["400"],
+          500: ZResErrorCommon["500"],
         },
       },
     },

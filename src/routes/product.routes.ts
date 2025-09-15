@@ -1,6 +1,6 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { ErrorCommonSchemas, ZSuccessResponse } from "../utils/zod.util";
+import { ZResErrorCommon, ZResOK } from "../utils/zod.util";
 
 export const ProductSchema = z.object({
   id: z.string().uuid(),
@@ -22,7 +22,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Create Product",
         body: CreateProductSchema,
-        response: { 201: ZSuccessResponse(ProductSchema) },
+        response: { 201: ZResOK(ProductSchema) },
       },
     },
     async (req, reply) => {
@@ -40,8 +40,8 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Get All Products",
         response: {
-          200: ZSuccessResponse(z.array(ProductSchema)),
-          ...ErrorCommonSchemas
+          200: ZResOK(z.array(ProductSchema)),
+          ...ZResErrorCommon
         },
       },
     },
@@ -58,7 +58,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Get Product by ID",
         params: z.object({ id: z.string().uuid() }),
-        response: { 200: ZSuccessResponse(ProductSchema) },
+        response: { 200: ZResOK(ProductSchema) },
       },
     },
     async (req, reply) => {
@@ -76,7 +76,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Update Product",
         params: z.object({ id: z.string().uuid() }),
         body: UpdateProductSchema,
-        response: { 200: ZSuccessResponse(ProductSchema) },
+        response: { 200: ZResOK(ProductSchema) },
       },
     },
     async (req, reply) => {
@@ -95,7 +95,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Delete Product",
         params: z.object({ id: z.string().uuid() }),
-        response: { 200: ZSuccessResponse(z.object({ message: z.string() })) },
+        response: { 200: ZResOK(z.object({ message: z.string() })) },
       },
     },
     async (req, reply) => {

@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { generateRequestId } from '../utils/helpers.util';
-import { ZSuccessResponse } from '../utils/zod.util';
+import { ZResOK } from '../utils/zod.util';
 
 declare module 'fastify' {
   interface FastifyReply {
@@ -52,7 +52,7 @@ export const onRequestHook = async (request: FastifyRequest, reply: FastifyReply
       }
     }
 
-    const parsedResponse = ZSuccessResponse(z.any()).parse(response);
+    const parsedResponse = ZResOK(z.any()).parse(response);
     return this.status(statusCode).send(parsedResponse);
   };
 };

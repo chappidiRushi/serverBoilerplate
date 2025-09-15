@@ -1,6 +1,6 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import z from "zod";
-import { ErrorCommonSchemas, ZSuccessResponse } from "../../utils/zod.util";
+import { ZResErrorCommon, ZResOK } from "../../utils/zod.util";
 import { colorCreate, colorDelete, colorUpdate } from "./color.controller";
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
 
@@ -18,9 +18,9 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Color Create",
         body: ZColorRouteCreate,
         response: {
-          201: ZSuccessResponse(ZColor),
-          400: ErrorCommonSchemas["400"],
-          500: ErrorCommonSchemas["500"],
+          201: ZResOK(ZColor),
+          400: ZResErrorCommon["400"],
+          500: ZResErrorCommon["500"],
         },
       },
     },
@@ -38,9 +38,9 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Color Update",
         body: ZColorRouteUpdate,
         response: {
-          200: ZSuccessResponse(ZColor),
-          400: ErrorCommonSchemas["400"],
-          500: ErrorCommonSchemas["500"],
+          200: ZResOK(ZColor),
+          400: ZResErrorCommon["400"],
+          500: ZResErrorCommon["500"],
         },
       },
     },
@@ -60,9 +60,9 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Color Delete",
         // body: ZColorRouteUpdate,
         response: {
-          200: ZSuccessResponse(ZId),
-          400: ErrorCommonSchemas["400"],
-          500: ErrorCommonSchemas["500"],
+          200: ZResOK(ZId),
+          400: ZResErrorCommon["400"],
+          500: ZResErrorCommon["500"],
         },
       },
     },
