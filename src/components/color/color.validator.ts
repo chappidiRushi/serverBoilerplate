@@ -1,12 +1,12 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
-import { colorTable } from "../db/schemas/color.schema";
+import { colorTable } from "../../db/schemas/color.schema";
 
 
 
 
 export const ZColorInsertSchema = createInsertSchema(colorTable);
-export const ZColorSelectSchema  = createSelectSchema(colorTable);
+export const ZColorSelectSchema = createSelectSchema(colorTable);
 
 export const ZColor = ZColorSelectSchema;
 export const ZColorRouteCreate = ZColorInsertSchema.pick({ hexCode: true, name: true });

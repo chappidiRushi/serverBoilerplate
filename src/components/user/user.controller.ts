@@ -1,8 +1,8 @@
-import { TUserRouteCreate, TUserRouteLogin } from "@validators/user.validator";
+import { TUserRouteCreate, TUserRouteLogin } from "components/user/user.validator";
 import { userTable } from "db/schemas/user.schema";
 import { eq } from 'drizzle-orm';
 import { FastifyReply } from "fastify/types/reply";
-import { comparePassword, hashPassword } from "../utils/auth";
+import { comparePassword, hashPassword } from "../../utils/auth";
 
 
 export const UserCreate = async function (payload: TUserRouteCreate) {

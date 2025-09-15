@@ -1,8 +1,8 @@
 import { type FastifyInstance } from "fastify";
+import { colorRoute } from "../components/color/color.routes";
+import { userRoutes } from "../components/user/user.routes";
 import { config } from "../config/env";
-import { colorRoute } from "./color.routes";
 import { productRoutes } from "./product.routes";
-import { userRoutes } from "./user.routes";
 
 export async function RegisterRoutes(fastify: FastifyInstance) {
   fastify.get('/health', async (request, reply) => {

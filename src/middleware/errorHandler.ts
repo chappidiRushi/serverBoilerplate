@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
-import { HTTP_STATUS } from '../config/constants';
+import { HTTP_STATUS } from '../constants/constants';
 import { config } from '../config/env';
 import { HttpError } from '../utils/errors';
 import { logger } from '../utils/logger';

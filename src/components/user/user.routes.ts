@@ -1,8 +1,8 @@
-import { UserRouteCreateSchema, UserRouteLoginReply, UserRouteLoginReq, UserSelectSchema } from "@validators/user.validator";
+import { UserRouteCreateSchema, UserRouteLoginReply, UserRouteLoginReq, UserSelectSchema } from "components/user/user.validator";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { UserCreate, UserLogin } from "../controllers/user.controller";
-import { logger } from "../utils/logger";
-import { ErrorCommonSchemas, SuccessResponseSchema } from "../utils/response";
+import { logger } from "../../utils/logger";
+import { ErrorCommonSchemas, SuccessResponseSchema } from "../../utils/response";
+import { UserCreate, UserLogin } from "./user.controller";
 
 
 export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {

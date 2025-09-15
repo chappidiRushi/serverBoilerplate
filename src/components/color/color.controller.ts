@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
-import { colorTable } from "../db/schemas/color.schema";
-import { now } from "../utils/helpers";
-import { TColorRouteCreate, TColorRouteUpdate } from "../validators/color.validator";
+import { colorTable } from "../../db/schemas/color.schema";
+import { now } from "../../utils/helpers";
+import { TColorRouteCreate, TColorRouteUpdate } from "./color.validator";
 
 
 export const colorCreate = async function (data: TColorRouteCreate) {

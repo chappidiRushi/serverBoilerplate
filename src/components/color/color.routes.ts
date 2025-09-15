@@ -1,8 +1,8 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import z from "zod";
-import { colorCreate, colorDelete, colorUpdate } from "../controllers/color.controller";
-import { ErrorCommonSchemas, SuccessResponseSchema } from "../utils/response";
-import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "../validators/color.validator";
+import { ErrorCommonSchemas, SuccessResponseSchema } from "../../utils/response";
+import { colorCreate, colorDelete, colorUpdate } from "./color.controller";
+import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
 
 
 
