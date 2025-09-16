@@ -76,7 +76,6 @@ export const ZReqPaginationTyped = <T extends ZodRawShape>(
   schema: z.ZodObject<T>
 ) => {
   const keyEnum = schema.keyof(); // ZodEnum<["id", "name", "hex", ...]>
-
   return z.object({
     page: z
       .preprocess((val) => Number(val), z.number().int().positive().default(1)),

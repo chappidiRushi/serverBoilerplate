@@ -6,7 +6,7 @@ import { eq, sql } from "drizzle-orm";
 import { TColor, TColorGetParams, TColorRouteCreate, TColorRouteUpdate } from "./color.validator";
 
 
-export async function getColorList(params: TColorGetParams): Promise<{ data: TColor[], pagination: TPaginationMeta }> {
+export async function getColorList(params: TColorGetParams): Promise<{ items: TColor[], pagination: TPaginationMeta }> {
   const { page, limit, sortBy, sortOrder, search, filters } = params;
   const offset = getOffset(page, limit);
 
@@ -23,7 +23,7 @@ export async function getColorList(params: TColorGetParams): Promise<{ data: TCo
   const rows = await q.limit(limit).offset(offset);
 
   return {
-    data: rows,
+    items: rows,
     pagination: buildPaginationMeta(Number(count), page, limit),
   };
 }

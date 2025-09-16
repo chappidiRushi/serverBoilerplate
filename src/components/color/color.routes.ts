@@ -16,7 +16,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "Color Get",
-        params: ZReqPaginationTyped(ZColor),
+        querystring: ZReqPaginationTyped(ZColor),
         response: {
           201: ZResOKPagination(ZColor),
           400: ZResErrorCommon["400"],
@@ -25,7 +25,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (req, reply) => {
-      const data = getColorList(req.params)
+      const data = await getColorList(req.query)
       return reply.success(data, 201, "Colors Fetched Successfully");
     }
   );
