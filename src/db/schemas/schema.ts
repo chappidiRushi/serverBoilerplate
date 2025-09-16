@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { sql } from "drizzle-orm"
-import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core"
-import { colorTable } from "./color.schema"
-
+import { sql } from "drizzle-orm";
+import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { colorTable } from "./color.schema";
+import { userTable } from "./user.schema";
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
 export const damageType = pgEnum("DamageType", ['USER_DELIVERY', 'SUPPLIER_DELIVERY', 'WAREHOUSE_IN_HOUSE'])
@@ -60,11 +60,11 @@ export const plants = pgTable("Plants", {
 	index("Plants_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 ]);
 
-export const plantVariants = pgTable("PlantVariants", {
+export const plantVariants = pgTable("plant_variants", {
 	variantId: text().primaryKey().notNull(),
 	plantId: text().notNull(),
 	plantSizeId: text().notNull(),
-	colorId: text().notNull(),
+	colorId: uuid().notNull(),
 	sku: text().notNull(),
 	isProductActive: boolean().default(true).notNull(),
 	mrp: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
@@ -383,7 +383,7 @@ export const plantCategory = pgTable("PlantCategory", {
 
 export const potVariants = pgTable("PotVariants", {
 	potVariantId: text().primaryKey().notNull(),
-	colorId: text().notNull(),
+	colorId: uuid().notNull(),
 	potName: text().notNull(),
 	sku: text().notNull(),
 	mrp: numeric({ precision: 65, scale: 30 }).default('0.0').notNull(),
@@ -517,34 +517,34 @@ export const potVariantToTags = pgTable("_PotVariantToTags", {
 ]);
 
 
-export const userTable = pgTable("user", {
-	userId: text().primaryKey().notNull(),
-	// roleId: text().notNull(),
-	fullName: text().notNull(),
-	phoneNumber: text(),
-	email: text().notNull(),
-	password: text().notNull(),
-	isActive: boolean().default(true).notNull(),
-	profileImageUrl: text(),
-	publicId: text(),
-	phoneVerified: boolean().default(false).notNull(),
-	emailVerified: boolean().default(false).notNull(),
-	address: jsonb(),
-	deactivationReason: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	uniqueIndex("User_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
-	index("User_phoneNumber_email_idx").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops"), table.email.asc().nullsLast().op("text_ops")),
-	uniqueIndex("User_phoneNumber_key").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops")),
-	index("User_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-	// foreignKey({
-	// 	columns: [table.roleId],
-	// 	foreignColumns: [role.roleId],
-	// 	name: "User_roleId_fkey"
-	// }).onUpdate("cascade").onDelete("restrict"),
-]);
+// export const userTable = pgTable("user", {
+// 	userId: text().primaryKey().notNull(),
+// 	// roleId: text().notNull(),
+// 	fullName: text().notNull(),
+// 	phoneNumber: text(),
+// 	email: text().notNull(),
+// 	password: text().notNull(),
+// 	isActive: boolean().default(true).notNull(),
+// 	profileImageUrl: text(),
+// 	publicId: text(),
+// 	phoneVerified: boolean().default(false).notNull(),
+// 	emailVerified: boolean().default(false).notNull(),
+// 	address: jsonb(),
+// 	deactivationReason: text(),
+// 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+// 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+// 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+// }, (table) => [
+// 	uniqueIndex("User_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+// 	index("User_phoneNumber_email_idx").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops"), table.email.asc().nullsLast().op("text_ops")),
+// 	uniqueIndex("User_phoneNumber_key").using("btree", table.phoneNumber.asc().nullsLast().op("text_ops")),
+// 	index("User_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+// 	// foreignKey({
+// 	// 	columns: [table.roleId],
+// 	// 	foreignColumns: [role.roleId],
+// 	// 	name: "User_roleId_fkey"
+// 	// }).onUpdate("cascade").onDelete("restrict"),
+// ]);
 
 
 
