@@ -1,7 +1,7 @@
+import { ZReqPaginationTyped, ZResErrorCommon, ZResOK, ZResOKPagination } from "@utils/zod.util";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import z from "zod";
-import { ZResErrorCommon, ZResOK } from "../../utils/zod.util";
-import { colorCreate, colorDelete, colorUpdate } from "./color.controller";
+import { colorCreate, colorDelete, colorUpdate, getColorList } from "./color.controller";
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
 
 
@@ -11,6 +11,24 @@ const ZId = z.object({
 })
 
 export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
+  fastify.get(
+    "/",
+    {
+      schema: {
+        summary: "Color Get",
+        params: ZReqPaginationTyped(ZColor),
+        response: {
+          201: ZResOKPagination(ZColor),
+          400: ZResErrorCommon["400"],
+          500: ZResErrorCommon["500"],
+        },
+      },
+    },
+    async (req, reply) => {
+      const data = getColorList(req.params)
+      return reply.success(data, 201, "Colors Fetched Successfully");
+    }
+  );
   fastify.post(
     "/",
     {

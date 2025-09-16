@@ -31,6 +31,9 @@
       "@validators/*": [
         "validators/*"
       ],
+      "@db/*": [
+        "db/*"
+      ],
     },
     "types": [
       "bun-types",

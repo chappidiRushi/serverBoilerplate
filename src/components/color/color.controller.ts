@@ -1,16 +1,40 @@
-import { eq } from "drizzle-orm";
-import { colorTable } from "../../db/schemas/color.schema";
-import { now } from "../../utils/helpers.util";
-import { TColorRouteCreate, TColorRouteUpdate } from "./color.validator";
+import { colorTable } from "@db/schemas/color.schema";
+import { now } from "@utils/helpers.util";
+import { applyFilters, applySearch, applySorting, buildPaginationMeta, getOffset } from "@utils/query.util";
+import { TPaginationMeta } from "@utils/zod.util";
+import { eq, sql } from "drizzle-orm";
+import { TColor, TColorGetParams, TColorRouteCreate, TColorRouteUpdate } from "./color.validator";
 
+
+export async function getColorList(params: TColorGetParams): Promise<{ data: TColor[], pagination: TPaginationMeta }> {
+  const { page, limit, sortBy, sortOrder, search, filters } = params;
+  const offset = getOffset(page, limit);
+
+  const table = colorTable;
+  let q = db.select().from(table);
+  q = applySearch(q, table, search);
+  q = applyFilters(q, table, filters);
+  q = applySorting(q, table, sortBy, sortOrder);
+
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(q.as("sub"));
+
+  const rows = await q.limit(limit).offset(offset);
+
+  return {
+    data: rows,
+    pagination: buildPaginationMeta(Number(count), page, limit),
+  };
+}
 
 export const colorCreate = async function (data: TColorRouteCreate) {
   const { hexCode, name } = data
   const [colorExists] = await db.select().from(colorTable).where(eq(colorTable.name, name)).limit(1)
   if (colorExists) throw CE.BAD_REQUEST_400(`Color With Name: ${name} Already Exists`);
   const [newColor] = await db.insert(colorTable).values({
-    name, hexCode,
-    id: crypto.randomUUID(),
+    name: name,
+    hexCode: hexCode,
     createdAt: now(),
     updatedAt: now(),
   }).returning();
