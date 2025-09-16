@@ -394,20 +394,30 @@ export const potVariants = pgTable("PotVariants", {
 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
 	sizeMaterialOptionId: text().notNull(),
 }, (table) => [
-	index("PotVariants_colorId_idx").using("btree", table.colorId.asc().nullsLast().op("text_ops")),
-	uniqueIndex("PotVariants_sizeMaterialOptionId_colorId_key").using("btree", table.sizeMaterialOptionId.asc().nullsLast().op("text_ops"), table.colorId.asc().nullsLast().op("text_ops")),
-	uniqueIndex("PotVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
+	// ✅ Drop text_ops
+	index("PotVariants_colorId_idx").using("btree", table.colorId.asc().nullsLast()),
+
+	uniqueIndex("PotVariants_sizeMaterialOptionId_colorId_key").using(
+		"btree",
+		table.sizeMaterialOptionId.asc().nullsLast(),
+		table.colorId.asc().nullsLast()
+	),
+
+	uniqueIndex("PotVariants_sku_key").using("btree", table.sku.asc().nullsLast()),
+
 	foreignKey({
 		columns: [table.colorId],
 		foreignColumns: [colorTable.id],
-		name: "PotVariants_colorId_fkey"
+		name: "PotVariants_colorId_fkey",
 	}).onUpdate("cascade").onDelete("restrict"),
+
 	foreignKey({
 		columns: [table.sizeMaterialOptionId],
 		foreignColumns: [sizeMaterialOption.sizeMaterialOptionId],
-		name: "PotVariants_sizeMaterialOptionId_fkey"
+		name: "PotVariants_sizeMaterialOptionId_fkey",
 	}).onUpdate("cascade").onDelete("restrict"),
 ]);
+
 
 export const potSizeProfile = pgTable("PotSizeProfile", {
 	potSizeProfileId: text().primaryKey().notNull(),
