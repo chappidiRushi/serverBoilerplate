@@ -11,10 +11,11 @@ export async function SecurityPlugin(fastify: FastifyInstance) {
   await fastify.register(cors, {
     origin: (origin, cb) => cb(null, true),
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 
   await fastify.register(helmet, { contentSecurityPolicy: false });
   await fastify.register(compress);
-  await fastify.register(rateLimit, { max: 1000, timeWindow: '5 minutes' });
+  await fastify.register(rateLimit, { max: 10000, timeWindow: '5 minutes' });
   await fastify.register(jwt, { secret: config.JWT_SECRET });
 }
