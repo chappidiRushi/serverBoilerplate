@@ -1,11 +1,11 @@
 import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
+import { plantCategory } from "./plant_category.shema";
 import {
 	compatiblePots,
 	fertilizers,
 	humidityLevel,
 	plantCareGuidelines,
-	plantCategory,
 	plantFertilizerSchedule,
 	plants,
 	plantSizeProfile,
@@ -51,7 +51,7 @@ export const potMaterialRelations = relations(potMaterial, ({ many }) => ({
 export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
 	plantCategory: one(plantCategory, {
 		fields: [productCategories.a],
-		references: [plantCategory.categoryId]
+		references: [plantCategory.id]
 	}),
 	plant: one(plants, {
 		fields: [productCategories.b],

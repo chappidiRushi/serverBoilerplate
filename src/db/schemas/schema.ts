@@ -2,6 +2,7 @@
 import { sql } from "drizzle-orm";
 import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { colorTable } from "./color.schema";
+import { plantCategory } from "./plant_category.shema";
 import { userTable } from "./user.schema";
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
@@ -370,17 +371,6 @@ export const notification = pgTable(
 	]
 );
 
-export const plantCategory = pgTable("PlantCategory", {
-	categoryId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	description: text().notNull(),
-	publicId: text().notNull(),
-	mediaUrl: text(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
 export const potVariants = pgTable("PotVariants", {
 	potVariantId: text().primaryKey().notNull(),
 	colorId: uuid().notNull(),
@@ -461,7 +451,7 @@ export const productCategories = pgTable("_ProductCategories", {
 	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
 	foreignKey({
 		columns: [table.a],
-		foreignColumns: [plantCategory.categoryId],
+		foreignColumns: [plantCategory.id],
 		name: "_ProductCategories_A_fkey"
 	}).onUpdate("cascade").onDelete("cascade"),
 	foreignKey({
