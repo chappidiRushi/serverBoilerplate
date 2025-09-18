@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
-import { plantCategory } from "./plant_category.shema";
+import { plantCategoryTable } from "./plant_category.shema";
 import {
 	compatiblePots,
 	fertilizers,
@@ -49,9 +49,9 @@ export const potMaterialRelations = relations(potMaterial, ({ many }) => ({
 }));
 
 export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
-	plantCategory: one(plantCategory, {
+	plantCategoryTable: one(plantCategoryTable, {
 		fields: [productCategories.a],
-		references: [plantCategory.id]
+		references: [plantCategoryTable.id]
 	}),
 	plant: one(plants, {
 		fields: [productCategories.b],
@@ -59,7 +59,7 @@ export const productCategoriesRelations = relations(productCategories, ({ one })
 	}),
 }));
 
-export const plantCategoryRelations = relations(plantCategory, ({ many }) => ({
+export const plantCategoryTableRelations = relations(plantCategoryTable, ({ many }) => ({
 	productCategories: many(productCategories),
 }));
 

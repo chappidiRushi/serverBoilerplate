@@ -2,7 +2,7 @@
 import { sql } from "drizzle-orm";
 import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { colorTable } from "./color.schema";
-import { plantCategory } from "./plant_category.shema";
+import { plantCategoryTable } from "./plant_category.shema";
 import { userTable } from "./user.schema";
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
@@ -451,7 +451,7 @@ export const productCategories = pgTable("_ProductCategories", {
 	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
 	foreignKey({
 		columns: [table.a],
-		foreignColumns: [plantCategory.id],
+		foreignColumns: [plantCategoryTable.id],
 		name: "_ProductCategories_A_fkey"
 	}).onUpdate("cascade").onDelete("cascade"),
 	foreignKey({
