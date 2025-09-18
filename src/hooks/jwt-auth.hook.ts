@@ -17,6 +17,6 @@ export const jwtAuthHook = async function (request: FastifyRequest, reply: Fasti
   try {
     await request.jwtVerify();
   } catch (err) {
-    reply.code(401).send({ error: 'Unauthorized' });
+    throw CE.UNAUTHORIZED_401("Unauthorized")
   }
 };

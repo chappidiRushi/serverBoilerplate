@@ -101,7 +101,7 @@ export const colorDelete = async function (id: string) {
     .delete(colorTable)
     .where(eq(colorTable.id, id));
 
-  if (deleted.length === 0) {
+  if (deleted.count === 0) {
     throw CE.INTERNAL_SERVER_ERROR_500("Failed to delete color");
   }
 
