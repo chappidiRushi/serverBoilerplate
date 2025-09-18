@@ -5,7 +5,6 @@ import { colorCreate, colorDelete, colorUpdate, getColorList } from "./color.con
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
 
 
-
 const ZId = z.object({
   id: z.string()
 })
@@ -22,6 +21,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
+        security: [{ bearerAuth: [] }],
       },
     },
     async (req, reply) => {
@@ -40,6 +40,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
+        security: [{ bearerAuth: [] }],
       },
     },
     async (req, reply) => {
@@ -60,6 +61,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
+        security: [{ bearerAuth: [] }],
       },
     },
     async (req, reply) => {
@@ -76,18 +78,18 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         params: ZId,
         summary: "Color Delete",
-        // body: ZColorRouteUpdate,
         response: {
           200: ZResOK(ZId),
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
+        security: [{ bearerAuth: [] }],
       },
     },
     async (req, reply) => {
       const id = req.params.id;
-      const deleted = colorDelete(id);
-      return reply.success(deleted, 200, "Color Update Successfully");
+      const deleted = await colorDelete(id);
+      return reply.success({ id }, 200, "Color Deleted Successfully");
     }
   );
 };

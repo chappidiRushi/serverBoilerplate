@@ -19,6 +19,7 @@ export const productRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post(
     "/",
     {
+      
       schema: {
         summary: "Create Product",
         body: CreateProductSchema,
