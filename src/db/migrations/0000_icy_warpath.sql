@@ -14,6 +14,17 @@ CREATE TABLE "color" (
 	"deleted_at" timestamp(3)
 );
 --> statement-breakpoint
+CREATE TABLE "plant_category" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"description" text DEFAULT '',
+	"publicId" text NOT NULL,
+	"mediaUrl" text,
+	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updatedAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"deletedAt" timestamp(3)
+);
+--> statement-breakpoint
 CREATE TABLE "_CompatiblePots" (
 	"A" text NOT NULL,
 	"B" text NOT NULL,
@@ -68,17 +79,6 @@ CREATE TABLE "PlantCareGuidelines" (
 	"soilTypes" text NOT NULL,
 	"preferredSeasons" text NOT NULL,
 	"careNotes" text,
-	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"updatedAt" timestamp(3) NOT NULL,
-	"deletedAt" timestamp(3)
-);
---> statement-breakpoint
-CREATE TABLE "PlantCategory" (
-	"categoryId" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
-	"description" text NOT NULL,
-	"publicId" text NOT NULL,
-	"mediaUrl" text,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updatedAt" timestamp(3) NOT NULL,
 	"deletedAt" timestamp(3)
@@ -244,12 +244,6 @@ CREATE TABLE "_prisma_migrations" (
 	"applied_steps_count" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "_ProductCategories" (
-	"A" text NOT NULL,
-	"B" text NOT NULL,
-	CONSTRAINT "_ProductCategories_AB_pkey" PRIMARY KEY("A","B")
-);
---> statement-breakpoint
 CREATE TABLE "SerialTracker" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"entityCode" text NOT NULL,
@@ -346,12 +340,12 @@ ALTER TABLE "_PotVariantToTags" ADD CONSTRAINT "_PotVariantToTags_A_fkey" FOREIG
 ALTER TABLE "_PotVariantToTags" ADD CONSTRAINT "_PotVariantToTags_B_fkey" FOREIGN KEY ("B") REFERENCES "public"."Tags"("tagId") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "PotVariants" ADD CONSTRAINT "PotVariants_colorId_fkey" FOREIGN KEY ("colorId") REFERENCES "public"."color"("id") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "PotVariants" ADD CONSTRAINT "PotVariants_sizeMaterialOptionId_fkey" FOREIGN KEY ("sizeMaterialOptionId") REFERENCES "public"."SizeMaterialOption"("sizeMaterialOptionId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "_ProductCategories" ADD CONSTRAINT "_ProductCategories_A_fkey" FOREIGN KEY ("A") REFERENCES "public"."PlantCategory"("categoryId") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "_ProductCategories" ADD CONSTRAINT "_ProductCategories_B_fkey" FOREIGN KEY ("B") REFERENCES "public"."Plants"("plantId") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "SizeMaterialOption" ADD CONSTRAINT "SizeMaterialOption_potSizeProfileId_fkey" FOREIGN KEY ("potSizeProfileId") REFERENCES "public"."PotSizeProfile"("potSizeProfileId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "SizeMaterialOption" ADD CONSTRAINT "SizeMaterialOption_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "public"."PotMaterial"("materialId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "Tags" ADD CONSTRAINT "Tags_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "public"."TagGroups"("groupId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 CREATE UNIQUE INDEX "color_name_key" ON "color" USING btree ("name" text_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "plant_category_name_key" ON "plant_category" USING btree ("name");--> statement-breakpoint
+CREATE UNIQUE INDEX "plant_category_public_id_key" ON "plant_category" USING btree ("publicId");--> statement-breakpoint
 CREATE INDEX "_CompatiblePots_B_index" ON "_CompatiblePots" USING btree ("B" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "PlantCareGuidelines_plantSizeId_season_key" ON "PlantCareGuidelines" USING btree ("plantSizeId" text_ops,"season" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key" ON "PlantFertilizerSchedule" USING btree ("plantSizeId" text_ops,"fertilizerId" text_ops,"applicationSeason" text_ops);--> statement-breakpoint
@@ -370,7 +364,6 @@ CREATE INDEX "_PotVariantToTags_B_index" ON "_PotVariantToTags" USING btree ("B"
 CREATE INDEX "PotVariants_colorId_idx" ON "PotVariants" USING btree ("colorId");--> statement-breakpoint
 CREATE UNIQUE INDEX "PotVariants_sizeMaterialOptionId_colorId_key" ON "PotVariants" USING btree ("sizeMaterialOptionId","colorId");--> statement-breakpoint
 CREATE UNIQUE INDEX "PotVariants_sku_key" ON "PotVariants" USING btree ("sku");--> statement-breakpoint
-CREATE INDEX "_ProductCategories_B_index" ON "_ProductCategories" USING btree ("B" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "SizeMaterialOption_potSizeProfileId_materialId_key" ON "SizeMaterialOption" USING btree ("potSizeProfileId" text_ops,"materialId" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "User_email_key" ON "user" USING btree ("email" text_ops);--> statement-breakpoint
 CREATE INDEX "User_phoneNumber_email_idx" ON "user" USING btree ("phoneNumber" text_ops,"email" text_ops);--> statement-breakpoint
