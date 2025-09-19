@@ -66,7 +66,7 @@ export const plantCategoryPatch = async (input: TPlantCategoryRouteUpdate, id: s
       throw CE.BAD_REQUEST_400(`PlantCategory With Name: ${name} Already Exists`);
   }
 
-  const [updatedPlantCategory] = await db
+   const [updatedPlantCategory] = await db
     .update(plantCategoryTable)
     .set({
       ...input,

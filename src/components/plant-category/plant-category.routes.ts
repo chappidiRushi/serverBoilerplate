@@ -17,7 +17,7 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Plant Category Get",
         querystring: ZReqPaginationTyped(ZPlantCategory),
         response: {
-          201: ZResOKPagination(ZPlantCategory),
+          200: ZResOKPagination(ZPlantCategory),
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
@@ -26,7 +26,7 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (req, reply) => {
       const data = await getPlantCategoryList(req.query)
-      return reply.success(data, 201, "PlantCategory Fetched Successfully");
+      return reply.success(data, 200, "PlantCategory Fetched Successfully");
     }
   );
   fastify.post(
@@ -57,7 +57,7 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Plant Category Update",
         body: ZPlantCategoryRoutePatch,
         response: {
-          200: ZResOK(ZPlantCategory),
+          203: ZResOK(ZPlantCategory),
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
@@ -78,7 +78,7 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
         params: ZId,
         summary: "Plant Category Delete",
         response: {
-          200: ZResOK(ZId),
+          409: ZResOK(ZId),
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },
