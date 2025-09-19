@@ -24,7 +24,7 @@ export async function RegisterRoutes(fastify: FastifyInstance) {
     await instance.register(colorRoute);
   }, { prefix: '/api/color', });
   await fastify.register(async (instance) => {
-    instance.addHook('preHandler', jwtAuthHook);
+    // instance.addHook('preHandler', jwtAuthHook);
     await instance.register(plantCategoryRoute);
   }, { prefix: '/api/plant-category', });
 }

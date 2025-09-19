@@ -16,5 +16,5 @@ export const isValidEmail = (email: string): boolean => {
 
 
 export const now = function () {
-  return new Date().toISOString()
+  return new Date()
 }

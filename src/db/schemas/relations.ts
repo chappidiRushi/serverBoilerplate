@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
-import { plantCategoryTable } from "./plant_category.shema";
 import {
 	compatiblePots,
 	fertilizers,
@@ -18,11 +17,12 @@ import {
 	potVariantImage,
 	potVariants,
 	potVariantToTags,
-	productCategories,
 	sizeMaterialOption,
 	sunlightTypes,
 	tagGroups, tags
 } from "./schema";
+
+// productCategories
 
 export const sizeMaterialOptionRelations = relations(sizeMaterialOption, ({ one, many }) => ({
 	potVariants: many(potVariants),
@@ -48,20 +48,20 @@ export const potMaterialRelations = relations(potMaterial, ({ many }) => ({
 	sizeMaterialOptions: many(sizeMaterialOption),
 }));
 
-export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
-	plantCategoryTable: one(plantCategoryTable, {
-		fields: [productCategories.a],
-		references: [plantCategoryTable.id]
-	}),
-	plant: one(plants, {
-		fields: [productCategories.b],
-		references: [plants.plantId]
-	}),
-}));
+// export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
+// 	plantCategoryTable: one(plantCategoryTable, {
+// 		fields: [productCategories.a],
+// 		references: [plantCategoryTable.id]
+// 	}),
+// 	plant: one(plants, {
+// 		fields: [productCategories.b],
+// 		references: [plants.plantId]
+// 	}),
+// }));
 
-export const plantCategoryTableRelations = relations(plantCategoryTable, ({ many }) => ({
-	productCategories: many(productCategories),
-}));
+// export const plantCategoryTableRelations = relations(plantCategoryTable, ({ many }) => ({
+// 	productCategories: many(productCategories),
+// }));
 
 export const compatiblePotsRelations = relations(compatiblePots, ({ one }) => ({
 	plantSizeProfile: one(plantSizeProfile, {
@@ -517,7 +517,7 @@ export const plantsRelations = relations(plants, ({ many }) => ({
 	// plantRestockEventLogs: many(plantRestockEventLog),
 	// warehouseCartItems: many(warehouseCartItem),
 	// plantSupplierInventories: many(plantSupplierInventory),
-	productCategories: many(productCategories),
+	// productCategories: many(productCategories),
 }));
 
 export const plantVariantsRelations = relations(plantVariants, ({ one, many }) => ({
