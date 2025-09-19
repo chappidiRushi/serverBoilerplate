@@ -2,6 +2,7 @@
 import { sql } from "drizzle-orm";
 import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { colorTable } from "./color.schema";
+import { fertilizers } from "./fertilizers.shema";
 import { userTable } from "./user.schema";
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
@@ -282,20 +283,6 @@ export const plantFertilizerSchedule = pgTable("PlantFertilizerSchedule", {
 		name: "PlantFertilizerSchedule_fertilizerId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
 ]);
-
-export const fertilizers = pgTable("Fertilizers", {
-	fertilizerId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	type: text().notNull(),
-	composition: text().notNull(),
-	description: text(),
-	caution: text(),
-	isEcoFriendly: boolean().notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-});
-
 
 export const potMaterial = pgTable("PotMaterial", {
 	materialId: text().primaryKey().notNull(),

@@ -1,8 +1,8 @@
 import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
+import { fertilizers } from "./fertilizers.shema";
 import {
 	compatiblePots,
-	fertilizers,
 	humidityLevel,
 	plantCareGuidelines,
 	plantFertilizerSchedule,
