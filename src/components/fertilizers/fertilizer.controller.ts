@@ -1,4 +1,4 @@
-import { FertilizerTable } from "@db/schemas/plant_category.schema";
+import { FertilizerTable } from "@db/schemas/fertilizers.schema";
 import { now } from "@utils/helpers.util";
 import { applyFilters, applySearch, applySorting, buildPaginationMeta, getOffset } from "@utils/query.util";
 import { eq, sql } from "drizzle-orm";
@@ -55,22 +55,22 @@ export const FertilizerPost = async function (data: z.infer<typeof ZFertilizerPo
     throw CE.BAD_REQUEST_400(`Plant Category with name "${name}" already exists`);
 
   // Generate a public ID if not provided
-  if (!data.publicId) {
-    data.publicId = crypto.randomUUID();
-  }
+  // if (!data.publicId) {
+  //   data.publicId = crypto.randomUUID();
+  // }
 
   // Create new plant category
   const [newFertilizer] = await db
     .insert(FertilizerTable)
     .values({
       ...data,
-      createdAt: now(),
       updatedAt: now(),
+      createdAt: now(),
     })
     .returning();
 
   if (!newFertilizer)
-    throw CE.INTERNAL_SERVER_ERROR_500("Failed to create Plant Category");
+    throw CE.INTERNAL_SERVER_ERROR_500("Failed to create Fertilizer");
 
   return newFertilizer;
 }
@@ -172,7 +172,7 @@ export const FertilizerPostBulk = async function (data: z.infer<typeof ZFertiliz
   const timestamp = now();
   const dataToInsert = toInsert.map(item => ({
     ...item,
-    publicId: item.publicId || crypto.randomUUID(), // Generate public ID if not provided
+    // publicId: item. || crypto.randomUUID(), // Generate public ID if not provided
     createdAt: timestamp,
     updatedAt: timestamp
   }));

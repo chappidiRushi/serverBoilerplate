@@ -10,7 +10,11 @@ export const FertilizerTable = pgTable("Fertilizers", {
   description: text(),
   caution: text(),
   isEcoFriendly: boolean().notNull(),
-  createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-  updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-  deletedAt: timestamp({ precision: 3, mode: 'string' }),
+  createdAt: timestamp({ precision: 3, withTimezone: true, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, withTimezone: true, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  deletedAt: timestamp({ precision: 3, withTimezone: true, mode: "date" }),
 });

@@ -1,6 +1,6 @@
 import { FertilizerTable } from "@db/schemas/fertilizers.schema";
 import { ZBulkBody, ZBulkReq, ZGetReq, ZIDNum, ZIdObjStr, ZPaginationBody, ZResOK } from "@utils/zod.util";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createSelectSchema } from "drizzle-zod";
 import z from "zod";
 
 // -------------------------------------
@@ -12,9 +12,6 @@ const compositionRule = (s: z.ZodString) => s.min(1, "Composition is required").
 const descriptionRule = (s: z.ZodString) => s.max(5000, "Description must be at most 5000 characters").nullable().optional();
 const cautionRule = (s: z.ZodString) => s.max(2000, "Caution must be at most 2000 characters").nullable().optional();
 
-
-const usesRule = () => z.array(z.string()).nonempty("At least one use is required");
-
 // -------------------------------------
 // Fertilizer Schema
 // -------------------------------------
@@ -24,16 +21,14 @@ export const ZFertilizerOriginal = createSelectSchema(FertilizerTable, {
   composition: compositionRule,
   description: descriptionRule,
   caution: cautionRule,
-  // deletedAt: deletedAtRule,
-  // uses: usesRule, // <-- custom new field
 });
 
 
-export const ZFertilizerInsert = createInsertSchema(FertilizerTable, {
-  // name: nameRule,
-  // description: descriptionRule,
-  // mediaUrl: mediaUrlRule,
-});
+// export const ZFertilizerInsert = createInsertSchema(FertilizerTable, {
+//   // name: nameRule,
+//   // description: descriptionRule,
+//   // mediaUrl: mediaUrlRule,
+// });
 
 export const ZFertilizerAPi = ZFertilizerOriginal.omit({
   createdAt: true,
