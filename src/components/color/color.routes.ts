@@ -1,12 +1,12 @@
 import { ZReqPaginationTyped, ZResErrorCommon, ZResOK, ZResOKPagination } from "@utils/zod.util";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import z from "zod";
-import { colorCreate, colorDelete, colorUpdate, getColorList } from "./color.controller";
+import { colorCreate, getColorList } from "./color.controller";
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
 
 
 const ZId = z.object({
-  id: z.string()
+  id: z.number()
 })
 
 export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {

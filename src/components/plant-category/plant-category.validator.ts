@@ -1,10 +1,9 @@
-import z from "zod";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import z from "zod";
 import { plantCategoryTable } from "../../db/schemas/plant_category.shema";
 import {
   ZDeleteBulkReq,
   ZGetReq,
-  ZIDs,
   ZPatchBulkReq,
   ZPostBulkReq,
   ZResBulkOK,
@@ -72,7 +71,7 @@ export const ZPlantCategoryRouteBulkPatchResOK = ZResBulkOK(ZPlantCategoryAPi);
 
 // DELETE (bulk)
 export const ZPlantCategoryBulkDelete = ZDeleteBulkReq;
-export const ZPlantCategoryBulkDeleteResOk = ZResBulkOK(ZIDs);
+export const ZPlantCategoryBulkDeleteResOk = ZResBulkOK(z.object({id: z.number()}));
 
 // -------------------------------------
 // Types (auto from schemas)

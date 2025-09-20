@@ -179,10 +179,8 @@ export const plantCategoryBulkPost = async function (data: TPlantCategoryRouteBu
   }
 
   return {
-    data: created,
-    failed: failed.length > 0 ? failed : undefined,
-    success: created.length,
-    total: items.length
+    failed: failed,
+    success: created,
   };
 };
 
@@ -316,9 +314,7 @@ export const plantCategoryBulkDelete = async function (data: TPlantCategoryBulkD
   const allFailed = [...failedIds, ...undeleted];
 
   return {
-    data: { ids: successIds.slice(0, deletedCount) },
-    failed: allFailed.length > 0 ? allFailed : undefined,
-    success: deletedCount,
-    total: numericIds.length
+    failed: allFailed,
+    success: successIds.map(id => {return {id}}),
   };
 };

@@ -22,6 +22,8 @@ const ZId = z.object({
   id: z.string().describe("Plant category ID")
 });
 
+
+
 export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
   // GET all plant categories
   fastify.get(
@@ -177,7 +179,7 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
         tags: ["Plant Categories"],
         body: ZPlantCategoryBulkDelete,
         response: {
-          200: ZPlantCategoryBulkDeleteResOk,
+          209: ZPlantCategoryBulkDeleteResOk,
           400: ZResErrorCommon["400"],
           404: ZResErrorCommon["404"],
           500: ZResErrorCommon["500"],
@@ -186,8 +188,8 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (req, reply) => {
-      const result = await plantCategoryBulkDelete(req.body);
-      return reply.success(result, 200, "Plant Categories Deleted Successfully");
+      const result: z.infer<typeof ZPlantCategoryBulkDeleteResOk>["data"] = await plantCategoryBulkDelete(req.body);
+      return reply.success(result, 209, "Plant Categories Deleted Successfully");
     }
   );
 };

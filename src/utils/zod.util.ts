@@ -46,14 +46,14 @@ export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) =>
   ZResOK(z.array(dataSchema));
 
 /** Bulk operation response schema with success and failed arrays */
-export const ZResBulk = <T extends z.ZodTypeAny>(data: T) =>
+export const ZResBulk = <T extends z.ZodObject>(data: T) =>
   z.object({
     success: z.array(data),
-    failed: z.array(data),
+    failed: z.array(data.extend({reason: z.string().optional()})),
   });
 
 /** Success response schema for bulk operations */
-export const ZResBulkOK = <T extends z.ZodTypeAny>(data: T) =>
+export const ZResBulkOK = <T extends z.ZodObject>(data: T) =>
   ZResOK(ZResBulk(data));
 
 //#endregion
@@ -159,10 +159,9 @@ export const ZPatchBulkReq = <T extends z.ZodType>(data: T) =>
 //#endregion
 
 //#region --- ID/Bulk Delete Schemas ---
-
+export const ZID = z.number().or(z.string().regex(/^\d+$/, "ID must be numeric"))
 export const ZIDs = z
-  .array(z.number().or(z.string().regex(/^\d+$/, "ID must be numeric")));
-
+  .array(ZID);
 export const ZDeleteBulkReq = z.object({
   ids: ZIDs
     .min(1, "At least one ID is required")
