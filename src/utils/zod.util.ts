@@ -35,6 +35,8 @@ export const ZResError = ZResBoilerplate(false).extend({
   }),
 });
 
+export type TResError = z.infer<typeof ZResError>
+
 //#endregion
 
 //#region --- Success Response Schemas ---

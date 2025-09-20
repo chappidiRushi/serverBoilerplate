@@ -14,7 +14,7 @@
     "source.sort.json": "always",
     "source.sortImports": "always"
   },
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "eslint.validate": [
     "typescript"
   ],
