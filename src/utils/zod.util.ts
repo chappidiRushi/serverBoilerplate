@@ -1,15 +1,39 @@
 import { z, ZodRawShape } from 'zod';
-// import { ZColor } from '../components/color/color.validator';
 
-export const ZResOK = <T extends z.ZodTypeAny>(dataSchema: T) => z.object({
-  status: z.literal('success'),
-  message: z.string().optional(),
-  data: dataSchema,
-  meta: z.object({
-    timestamp: z.string(),
-    requestId: z.string(),
-  }),
-});
+
+
+
+
+export const ZResBoilerplate = (status: boolean) => {
+  return z.object({
+    status: z.literal(status),
+    message: z.string(),
+    meta: z.object({
+      timestamp: z.string(),
+      requestId: z.string(),
+    }),
+  })
+}
+
+export const ZResOK = <T extends z.ZodTypeAny>(data: T) => ZResBoilerplate(true).extend({
+  data: data
+})
+
+export const ZResError = <T extends z.ZodTypeAny>(data: T) => ZResBoilerplate(false).extend({
+  code: z.union([z.string(), z.number()]),
+  details: z.any().optional(),
+})
+
+export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) => ZResOK(z.array(dataSchema))
+
+export const ZResBulk = <T extends z.ZodTypeAny>(data: T) => {
+  return z.object({
+    success: z.array(data),
+    failed: z.array(data)
+  })
+}
+export const ZResBulkOK = <T extends z.ZodTypeAny>(data: T) => ZResOK(ZResBulk(data))
+
 
 
 export const ZPaginationMeta = z.object({
@@ -31,18 +55,6 @@ export const ZResOKPagination = <T extends z.ZodTypeAny>(itemSchema: T) =>
     })
   );
 
-export const ZResError = z.object({
-  success: z.literal(false),
-  message: z.string(),
-  error: z.object({
-    code: z.union([z.string(), z.number()]),
-    details: z.any().optional(),
-  }),
-  meta: z.object({
-    timestamp: z.string(),
-    requestId: z.string(),
-  }),
-});
 
 
 export const ZResErrorCommon = {

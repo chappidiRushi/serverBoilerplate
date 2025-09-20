@@ -1,22 +1,29 @@
 {
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "editor.formatOnSave": true,
+  "cSpell.words": [
+    "fkey",
+    "pkey",
+    "repotting"
+  ],
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.addMissingImports.ts": "always",
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.ts": "always",
+    "source.organizeImports": "always",
+    "source.removeUnused.ts": "always",
+    "source.removeUnusedImports": "always",
+    "source.sort.json": "always",
+    "source.sortImports": "always"
   },
+  "editor.formatOnSave": true,
   "eslint.validate": [
     "typescript"
   ],
   "files.associations": {
     "*.ts": "typescript"
   },
+  "peacock.color": "#08f844",
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "cSpell.words": [
-    "fkey",
-    "pkey",
-    "repotting"
-  ],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#3af96a",
     "activityBar.background": "#3af96a",
@@ -35,7 +42,6 @@
     "titleBar.activeForeground": "#15202b",
     "titleBar.inactiveBackground": "#08f84499",
     "titleBar.inactiveForeground": "#15202b99"
-  },
-  "peacock.color": "#08f844",
+  }
   // "typescript.tsdk": "node_modules/typescript/lib"
 }
