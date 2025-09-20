@@ -4,6 +4,7 @@
     "pkey",
     "repotting"
   ],
+  "typescript.preferences.importModuleSpecifier": "non-relative",
   "editor.codeActionsOnSave": {
     // "source.addMissingImports.ts": "always",
     // "source.fixAll.eslint": "explicit",

@@ -1,9 +1,9 @@
 import { sql } from "drizzle-orm";
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 
-export const fertilizers = pgTable("Fertilizers", {
-  fertilizerId: text().primaryKey().notNull(),
+export const FertilizerTable = pgTable("Fertilizers", {
+  id:  serial("id").primaryKey().notNull(),
   name: text().notNull(),
   type: text().notNull(),
   composition: text().notNull(),

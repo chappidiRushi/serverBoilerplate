@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
-import { fertilizers } from "./fertilizers.shema";
+import { FertilizerTable } from "./fertilizers.schema";
 import {
 	compatiblePots,
 	humidityLevel,
@@ -138,13 +138,13 @@ export const plantFertilizerScheduleRelations = relations(plantFertilizerSchedul
 		fields: [plantFertilizerSchedule.plantSizeId],
 		references: [plantSizeProfile.plantSizeId]
 	}),
-	fertilizer: one(fertilizers, {
+	fertilizer: one(FertilizerTable, {
 		fields: [plantFertilizerSchedule.fertilizerId],
-		references: [fertilizers.fertilizerId]
+		references: [FertilizerTable.id]
 	}),
 }));
 
-export const fertilizersRelations = relations(fertilizers, ({ many }) => ({
+export const fertilizersRelations = relations(FertilizerTable, ({ many }) => ({
 	plantFertilizerSchedules: many(plantFertilizerSchedule),
 }));
 

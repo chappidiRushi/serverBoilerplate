@@ -2,7 +2,7 @@
 import { sql } from "drizzle-orm";
 import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { colorTable } from "./color.schema";
-import { fertilizers } from "./fertilizers.shema";
+import { FertilizerTable } from "./fertilizers.schema";
 import { userTable } from "./user.schema";
 export const addedByType = pgEnum("AddedByType", ['SYSTEM', 'ADMIN', 'SUPERADMIN'])
 export const auditAction = pgEnum("AuditAction", ['ADDED', 'REVOKED', 'MODIFIED'])
@@ -257,32 +257,42 @@ export const humidityLevel = pgTable("HumidityLevel", {
 });
 
 export const plantFertilizerSchedule = pgTable("PlantFertilizerSchedule", {
-	fertilizerScheduleId: text().primaryKey().notNull(),
-	plantSizeId: text().notNull(),
-	fertilizerId: text().notNull(),
-	applicationFrequency: text().notNull(),
-	applicationMethod: text().array().default(["RAY"]),
-	applicationSeason: text().notNull(),
-	applicationTime: text().notNull(),
-	benefits: text().array().default(["RAY"]),
-	dosageAmount: numeric({ precision: 65, scale: 30 }).notNull(),
-	safetyNotes: text().array().default(["RAY"]),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+  fertilizerScheduleId: text().primaryKey().notNull(),
+  plantSizeId: text().notNull(),
+  fertilizerId: integer().notNull(),
+  applicationFrequency: text().notNull(),
+  applicationMethod: text().array().default(["RAY"]),
+  applicationSeason: text().notNull(),
+  applicationTime: text().notNull(),
+  benefits: text().array().default(["RAY"]),
+  dosageAmount: numeric({ precision: 65, scale: 30 }).notNull(),
+  safetyNotes: text().array().default(["RAY"]),
+  createdAt: timestamp({ precision: 3, mode: "string" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+  deletedAt: timestamp({ precision: 3, mode: "string" }),
 }, (table) => [
-	uniqueIndex("PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key").using("btree", table.plantSizeId.asc().nullsLast().op("text_ops"), table.fertilizerId.asc().nullsLast().op("text_ops"), table.applicationSeason.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.plantSizeId],
-		foreignColumns: [plantSizeProfile.plantSizeId],
-		name: "PlantFertilizerSchedule_plantSizeId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
-	foreignKey({
-		columns: [table.fertilizerId],
-		foreignColumns: [fertilizers.fertilizerId],
-		name: "PlantFertilizerSchedule_fertilizerId_fkey"
-	}).onUpdate("cascade").onDelete("restrict"),
+  uniqueIndex(
+    "PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key"
+  ).using(
+    "btree",
+    table.plantSizeId.asc().nullsLast().op("text_ops"),
+    table.fertilizerId.asc().nullsLast().op("int4_ops"), // 🔑 integer ops
+    table.applicationSeason.asc().nullsLast().op("text_ops"),
+  ),
+  foreignKey({
+    columns: [table.plantSizeId],
+    foreignColumns: [plantSizeProfile.plantSizeId],
+    name: "PlantFertilizerSchedule_plantSizeId_fkey",
+  }).onUpdate("cascade").onDelete("restrict"),
+  foreignKey({
+    columns: [table.fertilizerId],
+    foreignColumns: [FertilizerTable.id],
+    name: "PlantFertilizerSchedule_fertilizerId_fkey",
+  }).onUpdate("cascade").onDelete("restrict"),
 ]);
+
 
 export const potMaterial = pgTable("PotMaterial", {
 	materialId: text().primaryKey().notNull(),
