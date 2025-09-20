@@ -1,5 +1,5 @@
 {
-  "id": "93df9531-cec9-417d-8c7f-d48e2465453e",
+  "id": "91eca902-bef6-437d-aee8-ac73238225bf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -77,9 +77,9 @@
       "name": "Fertilizers",
       "schema": "",
       "columns": {
-        "fertilizerId": {
-          "name": "fertilizerId",
-          "type": "text",
+        "id": {
+          "name": "id",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -646,7 +646,7 @@
         },
         "fertilizerId": {
           "name": "fertilizerId",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -731,7 +731,7 @@
               "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops"
+              "opclass": "int4_ops"
             },
             {
               "expression": "applicationSeason",
@@ -769,7 +769,7 @@
             "fertilizerId"
           ],
           "columnsTo": [
-            "fertilizerId"
+            "id"
           ],
           "onDelete": "restrict",
           "onUpdate": "cascade"

@@ -15,7 +15,7 @@ CREATE TABLE "color" (
 );
 --> statement-breakpoint
 CREATE TABLE "Fertilizers" (
-	"fertilizerId" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"type" text NOT NULL,
 	"composition" text NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE "PlantCareGuidelines" (
 CREATE TABLE "PlantFertilizerSchedule" (
 	"fertilizerScheduleId" text PRIMARY KEY NOT NULL,
 	"plantSizeId" text NOT NULL,
-	"fertilizerId" text NOT NULL,
+	"fertilizerId" integer NOT NULL,
 	"applicationFrequency" text NOT NULL,
 	"applicationMethod" text[] DEFAULT '{"RAY"}',
 	"applicationSeason" text NOT NULL,
@@ -326,7 +326,7 @@ ALTER TABLE "PlantCareGuidelines" ADD CONSTRAINT "PlantCareGuidelines_plantSizeI
 ALTER TABLE "PlantCareGuidelines" ADD CONSTRAINT "PlantCareGuidelines_sunlightTypeId_fkey" FOREIGN KEY ("sunlightTypeId") REFERENCES "public"."SunlightTypes"("sunlightId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "PlantCareGuidelines" ADD CONSTRAINT "PlantCareGuidelines_humidityLevelId_fkey" FOREIGN KEY ("humidityLevelId") REFERENCES "public"."HumidityLevel"("humidityId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "PlantFertilizerSchedule" ADD CONSTRAINT "PlantFertilizerSchedule_plantSizeId_fkey" FOREIGN KEY ("plantSizeId") REFERENCES "public"."PlantSizeProfile"("plantSizeId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "PlantFertilizerSchedule" ADD CONSTRAINT "PlantFertilizerSchedule_fertilizerId_fkey" FOREIGN KEY ("fertilizerId") REFERENCES "public"."Fertilizers"("fertilizerId") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "PlantFertilizerSchedule" ADD CONSTRAINT "PlantFertilizerSchedule_fertilizerId_fkey" FOREIGN KEY ("fertilizerId") REFERENCES "public"."Fertilizers"("id") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "PlantSizeProfile" ADD CONSTRAINT "PlantSizeProfile_plantId_fkey" FOREIGN KEY ("plantId") REFERENCES "public"."Plants"("plantId") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "PlantVariantImage" ADD CONSTRAINT "PlantVariantImage_plantVariantId_fkey" FOREIGN KEY ("plantVariantId") REFERENCES "public"."plant_variants"("variantId") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "_PlantVariantToTags" ADD CONSTRAINT "_PlantVariantToTags_A_fkey" FOREIGN KEY ("A") REFERENCES "public"."plant_variants"("variantId") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -348,7 +348,7 @@ CREATE UNIQUE INDEX "plant_category_name_key" ON "plant_category" USING btree ("
 CREATE UNIQUE INDEX "plant_category_public_id_key" ON "plant_category" USING btree ("publicId");--> statement-breakpoint
 CREATE INDEX "_CompatiblePots_B_index" ON "_CompatiblePots" USING btree ("B" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "PlantCareGuidelines_plantSizeId_season_key" ON "PlantCareGuidelines" USING btree ("plantSizeId" text_ops,"season" text_ops);--> statement-breakpoint
-CREATE UNIQUE INDEX "PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key" ON "PlantFertilizerSchedule" USING btree ("plantSizeId" text_ops,"fertilizerId" text_ops,"applicationSeason" text_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "PlantFertilizerSchedule_plantSizeId_fertilizerId_applicatio_key" ON "PlantFertilizerSchedule" USING btree ("plantSizeId" text_ops,"fertilizerId" int4_ops,"applicationSeason" text_ops);--> statement-breakpoint
 CREATE INDEX "PlantVariantImage_plantVariantId_idx" ON "PlantVariantImage" USING btree ("plantVariantId" text_ops);--> statement-breakpoint
 CREATE INDEX "_PlantVariantToTags_B_index" ON "_PlantVariantToTags" USING btree ("B" text_ops);--> statement-breakpoint
 CREATE UNIQUE INDEX "PlantVariants_sku_key" ON "plant_variants" USING btree ("sku" text_ops);--> statement-breakpoint
