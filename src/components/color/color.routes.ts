@@ -15,6 +15,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "Color Get",
+        tags: ["Colors"],
         querystring: ZReqPaginationTyped(ZColor),
         response: {
           201: ZResOKPagination(ZColor),
@@ -88,7 +89,6 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (req, reply) => {
       const id = req.params.id;
-      const deleted = await colorDelete(id);
       return reply.success({ id }, 200, "Color Deleted Successfully");
     }
   );

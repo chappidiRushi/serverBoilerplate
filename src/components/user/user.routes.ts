@@ -1,7 +1,7 @@
+import { logger } from "@config/logger.config";
+import { ZResErrorCommon, ZResOK } from "@utils/zod.util";
 import { UserRouteCreateSchema, UserRouteLoginReply, UserRouteLoginReq, UserSelectSchema } from "components/user/user.validator";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { logger } from "../../config/logger.config";
-import { ZResErrorCommon, ZResOK } from "../../utils/zod.util";
 import { UserCreate, UserLogin } from "./user.controller";
 
 
@@ -11,11 +11,13 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "User Registration",
-        body: UserRouteCreateSchema,
+        description: "Register a new user with email, password, and other details.",
+        tags: ["User", "Auth"],
+        body: UserRouteCreateSchema.describe("User registration payload"),
         response: {
-          201: ZResOK(UserSelectSchema.omit({ password: true })),
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
+          201: ZResOK(UserSelectSchema.omit({ password: true })).describe("User registration success response"),
+          400: ZResErrorCommon["400"].describe("Bad request - validation or business error"),
+          500: ZResErrorCommon["500"].describe("Internal server error"),
         },
       },
     },
@@ -32,12 +34,15 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         summary: "User Login",
-        body: UserRouteLoginReq,
+        description: "Authenticate a user and return a JWT token on success.",
+        tags: ["User", "Auth"],
+        body: UserRouteLoginReq.describe("User login credentials"),
         response: {
-          200: ZResOK(UserRouteLoginReply),
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
+          200: ZResOK(UserRouteLoginReply).describe("Login success response with JWT"),
+          400: ZResErrorCommon["400"].describe("Invalid credentials or validation error"),
+          500: ZResErrorCommon["500"].describe("Internal server error"),
         },
+
       },
     },
     async (req, reply) => {

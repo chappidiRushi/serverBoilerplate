@@ -33,7 +33,8 @@ export const colorCreate = async function (data: TColorRouteCreate) {
   const [colorExists] = await db.select().from(colorTable).where(eq(colorTable.name, name)).limit(1)
   if (colorExists) throw CE.BAD_REQUEST_400(`Color With Name: ${name} Already Exists`);
   const [newColor] = await db.insert(colorTable).values({
-    name: name,
+    // name: name,
+
     hexCode: hexCode,
     createdAt: now(),
     updatedAt: now(),

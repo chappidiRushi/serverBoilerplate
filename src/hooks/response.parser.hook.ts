@@ -19,7 +19,7 @@ export const onRequestHook = async (request: FastifyRequest, reply: FastifyReply
   request.requestId = generateRequestId();
   reply.success = function <T>(data: T, statusCode: number, message = 'Success'): FastifyReply {
     const response = {
-      status: 'success' as const,
+      status: true,
       message,
       data,
       meta: {
