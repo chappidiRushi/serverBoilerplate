@@ -49,12 +49,12 @@ export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) =>
 export const ZResBulk = <T extends z.ZodObject>(data: T) =>
   z.object({
     success: z.array(data),
-    failed: z.array(data.extend({reason: z.string().optional()})),
+    failed: z.array(data.extend({ reason: z.string().optional() })),
   });
 
 /** Success response schema for bulk operations */
-export const ZResBulkOK = <T extends z.ZodObject>(data: T) =>
-  ZResOK(ZResBulk(data));
+export const ZResBulkOKData = <T extends z.ZodObject>(data: T) => ZResBulk(data)
+export const ZResBulkOK = <T extends z.ZodObject>(data: T) => ZResOK(ZResBulkOKData(data));
 
 //#endregion
 

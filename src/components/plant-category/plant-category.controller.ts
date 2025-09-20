@@ -1,19 +1,18 @@
 import { plantCategoryTable } from "@db/schemas/plant_category.shema";
 import { now } from "@utils/helpers.util";
 import { applyFilters, applySearch, applySorting, buildPaginationMeta, getOffset } from "@utils/query.util";
-import { TPaginationMeta } from "@utils/zod.util";
 import { eq, sql } from "drizzle-orm";
 import {
-  TPlantCategory,
   TPlantCategoryBulkDelete,
   TPlantCategoryGetParams,
   TPlantCategoryRouteBulkPatch,
   TPlantCategoryRouteBulkPost,
   TPlantCategoryRoutePatch,
-  TPlantCategoryRoutePost
+  TPlantCategoryRoutePost,
+  ZPlantCategoryGetRes
 } from "./plant-category.validator";
 
-export async function getPlantCategoryList(params: TPlantCategoryGetParams): Promise<{ items: TPlantCategory[], pagination: TPaginationMeta }> {
+export async function PlantCategoryGet(params: TPlantCategoryGetParams): Promise<DT<typeof ZPlantCategoryGetRes>> {
   const { page, limit, sortBy, sortOrder, search, filters } = params;
   const offset = getOffset(page, limit);
 
