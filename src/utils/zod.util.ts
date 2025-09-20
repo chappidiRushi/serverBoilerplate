@@ -1,25 +1,43 @@
 import { z, ZodRawShape } from 'zod';
 
+//#region --- Meta Schemas ---
+
+/** Standard response meta schema */
+const ZResMeta = z.object({
+  timestamp: z.string(),
+  requestId: z.string(),
+});
+
+//#endregion
+
 //#region --- Response Boilerplate ---
 
-/** Standard response schema with a given status (true/false) */
+/** Standard response boilerplate */
 export const ZResBoilerplate = (status: boolean) =>
   z.object({
     status: z.literal(status),
     message: z.string(),
-    meta: z.object({
-      timestamp: z.string(),
-      requestId: z.string(),
-    }),
+    meta: ZResMeta,
   });
+
+/** Success response schema with a data field of generic type */
+export const ZResOK = <T extends z.ZodTypeAny>(dataSchema: T) =>
+  ZResBoilerplate(true).extend({
+    data: dataSchema,
+    message: z.string().optional(),
+  });
+
+/** Error response schema with code and optional details */
+export const ZResError = ZResBoilerplate(false).extend({
+  error: z.object({
+    code: z.union([z.string(), z.number()]),
+    details: z.any().optional(),
+  }),
+});
 
 //#endregion
 
 //#region --- Success Response Schemas ---
-
-/** Success response schema with a data field of generic type */
-export const ZResOK = <T extends z.ZodTypeAny>(data: T) =>
-  ZResBoilerplate(true).extend({ data });
 
 /** Success response schema for an array of items */
 export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) =>
@@ -39,13 +57,6 @@ export const ZResBulkOK = <T extends z.ZodTypeAny>(data: T) =>
 //#endregion
 
 //#region --- Error Response Schemas ---
-
-/** Error response schema with code and optional details */
-export const ZResError = () =>
-  ZResBoilerplate(false).extend({
-    code: z.union([z.string(), z.number()]),
-    details: z.any().optional(),
-  });
 
 /** Common error response schemas mapped by HTTP status codes */
 export const ZResErrorCommon = {
@@ -100,11 +111,6 @@ export type TReqPagination = z.infer<typeof ZReqPagination>;
  * Generate pagination request schema from a Zod object schema
  * - Only allows sorting/filtering by keys present in the provided schema
  */
-
-//#endregion
-
-
-
 export const ZReqPaginationTyped = <T extends ZodRawShape>(
   schema: z.ZodObject<T>
 ) => {
@@ -119,33 +125,46 @@ export const ZReqPaginationTyped = <T extends ZodRawShape>(
   });
 };
 
+export const ZGetReq = <T extends ZodRawShape>(data: z.ZodObject<T>) =>
+  ZReqPaginationTyped(data);
 
-export const ZGetReq = <T extends ZodRawShape>(data: z.ZodObject<T>) => ZReqPaginationTyped(data)
+//#endregion
 
-export const ZPostBulkReq = <T extends z.ZodType>(data: T) => z.object({
-  items: z
-    .array(data)
-    .min(1, "At least one item is required")
-    .max(1000, "Maximum 100 items allowed at once"),
-});
+//#region --- Bulk Request Schemas ---
 
-export const ZPatchBulkReqItem = <T extends z.ZodType>(data: T) => z.object({
-  id: z.string().or(z.number()),
-  data: data,
-});
+export const ZPostBulkReq = <T extends z.ZodType>(data: T) =>
+  z.object({
+    items: z
+      .array(data)
+      .min(1, "At least one item is required")
+      .max(1000, "Maximum 100 items allowed at once"),
+  });
 
-export const ZPatchBulkReq = <T extends z.ZodType>(data: T) => z.object({
-  items: z
-    .array(data)
-    .min(1, "At least one item is required")
-    .max(100, "Maximum 100 items allowed at once"),
-})
+export const ZPatchBulkReqItem = <T extends z.ZodType>(data: T) =>
+  z.object({
+    id: z.string().or(z.number()),
+    data: data,
+  });
+
+export const ZPatchBulkReq = <T extends z.ZodType>(data: T) =>
+  z.object({
+    items: z
+      .array(data)
+      .min(1, "At least one item is required")
+      .max(100, "Maximum 100 items allowed at once"),
+  });
+
+//#endregion
+
+//#region --- ID/Bulk Delete Schemas ---
 
 export const ZIDs = z
-  .array(z.number().or(z.string().regex(/^\d+$/, "ID must be numeric")))
+  .array(z.number().or(z.string().regex(/^\d+$/, "ID must be numeric")));
 
 export const ZDeleteBulkReq = z.object({
   ids: ZIDs
     .min(1, "At least one ID is required")
     .max(100, "Maximum 100 IDs allowed at once"),
-})
+});
+
+//#endregion
