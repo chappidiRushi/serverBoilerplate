@@ -2,17 +2,25 @@ import { plantCategoryTable } from "@db/schemas/plant_category.shema";
 import { now } from "@utils/helpers.util";
 import { applyFilters, applySearch, applySorting, buildPaginationMeta, getOffset } from "@utils/query.util";
 import { eq, sql } from "drizzle-orm";
+import z from "zod";
+import { id } from "zod/locales";
 import {
-  TPlantCategoryBulkDelete,
-  TPlantCategoryGetParams,
-  TPlantCategoryRouteBulkPatch,
-  TPlantCategoryRouteBulkPost,
-  TPlantCategoryRoutePatch,
-  TPlantCategoryRoutePost,
-  ZPlantCategoryGetRes
+  ZPlantCategoryBulkDeleteReq,
+  ZPlantCategoryBulkDeleteRes,
+  ZPlantCategoryDeleteReq,
+  ZPlantCategoryDeleteRes,
+  ZPlantCategoryGetReq,
+  ZPlantCategoryGetRes,
+  ZPlantCategoryPatchBulkReq,
+  ZPlantCategoryPatchBulkRes,
+  ZPlantCategoryPatchReq,
+  ZPlantCategoryPostBulkReq,
+  ZPlantCategoryPostBulkRes,
+  ZPlantCategoryPostReq,
+  ZPlantCategoryPostRes
 } from "./plant-category.validator";
 
-export async function PlantCategoryGet(params: TPlantCategoryGetParams): Promise<DT<typeof ZPlantCategoryGetRes>> {
+export async function PlantCategoryGet(params: z.infer<typeof ZPlantCategoryGetReq>): Promise<DT<typeof ZPlantCategoryGetRes>> {
   const { page, limit, sortBy, sortOrder, search, filters } = params;
   const offset = getOffset(page, limit);
 
@@ -34,7 +42,7 @@ export async function PlantCategoryGet(params: TPlantCategoryGetParams): Promise
   };
 }
 
-export const plantCategoryPost = async function (data: TPlantCategoryRoutePost) {
+export const PlantCategoryPost = async function (data: z.infer<typeof ZPlantCategoryPostReq>): Promise<DT<typeof ZPlantCategoryPostRes>> {
   const { name } = data;
 
   // Check if name already exists
@@ -68,12 +76,12 @@ export const plantCategoryPost = async function (data: TPlantCategoryRoutePost) 
   return newPlantCategory;
 }
 
-export const plantCategoryPatch = async function (input: Omit<TPlantCategoryRoutePatch, 'id'>, id: string) {
+export const PlantCategoryPatch = async function (input: z.infer<typeof ZPlantCategoryPatchReq>): Promise<DT<typeof ZPlantCategoryPostRes>> {
   // Check if plant category exists
   const [existingPlantCategory] = await db
     .select()
     .from(plantCategoryTable)
-    .where(eq(plantCategoryTable.id, Number(id)))
+    .where(eq(plantCategoryTable.id, Number(input.id)))
     .limit(1);
 
   if (!existingPlantCategory)
@@ -107,7 +115,9 @@ export const plantCategoryPatch = async function (input: Omit<TPlantCategoryRout
   return updatedPlantCategory;
 };
 
-export const plantCategoryDelete = async function (id: string) {
+export const PlantCategoryDelete = async function (params: z.infer<typeof ZPlantCategoryDeleteReq>): Promise<DT<typeof ZPlantCategoryDeleteRes>> {
+  const { id } = params;
+
   // Check if plant category exists
   const [existingPlantCategory] = await db
     .select()
@@ -131,7 +141,7 @@ export const plantCategoryDelete = async function (id: string) {
   return { id };
 };
 
-export const plantCategoryBulkPost = async function (data: TPlantCategoryRouteBulkPost) {
+export const PlantCategoryPostBulk = async function (data: z.infer<typeof ZPlantCategoryPostBulkReq>): Promise<DT <typeof ZPlantCategoryPostBulkRes>> {
   const { items } = data;
 
   // Extract names to check for duplicates
@@ -183,7 +193,7 @@ export const plantCategoryBulkPost = async function (data: TPlantCategoryRouteBu
   };
 };
 
-export const plantCategoryBulkPatch = async function (data: TPlantCategoryRouteBulkPatch) {
+export const plantCategoryBulkPatch = async function (data: z.infer<typeof ZPlantCategoryPatchBulkReq>): Promise<DT<typeof ZPlantCategoryPatchBulkRes>> {
   const { items } = data;
 
   // Extract IDs and collect updates by ID
@@ -245,7 +255,7 @@ export const plantCategoryBulkPatch = async function (data: TPlantCategoryRouteB
   // Perform updates
   const timestamp = now();
   const updated = [];
-  const failed = [];
+  const failed :{id: number, reason: string}[] = [];
 
   for (const id of ids) {
     const updateData = updates.get(id);
@@ -272,18 +282,16 @@ export const plantCategoryBulkPatch = async function (data: TPlantCategoryRouteB
   }
 
   return {
-    data: updated,
-    failed: failed.length > 0 ? failed : undefined,
-    success: updated.length,
-    total: ids.length
+    failed: failed,
+    success: updated,
   };
 };
 
-export const plantCategoryBulkDelete = async function (data: TPlantCategoryBulkDelete) {
-  const { ids } = data;
+export const PlantCategoryBulkDelete = async function (data: z.infer<typeof ZPlantCategoryBulkDeleteReq>): Promise<DT<typeof ZPlantCategoryBulkDeleteRes>> {
+  const { items  } = data;
 
   // Convert string IDs to numbers
-  const numericIds = ids.map(id => typeof id === 'string' ? Number(id) : id);
+  const numericIds = items.map(id => typeof id === 'string' ? Number(id) : id);
 
   // Check which categories exist
   const existingCategories = await db
@@ -313,7 +321,7 @@ export const plantCategoryBulkDelete = async function (data: TPlantCategoryBulkD
   const allFailed = [...failedIds, ...undeleted];
 
   return {
-    failed: allFailed,
-    success: successIds.map(id => {return {id}}),
+    failed: allFailed.map(fail => ({ reason: fail.reason })),
+    success: successIds.map(id => {return {id: id.toString()}}),
   };
 };

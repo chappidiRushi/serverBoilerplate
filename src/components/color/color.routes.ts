@@ -1,7 +1,7 @@
-import { ZReqPaginationTyped, ZResErrorCommon, ZResOK, ZResOKPagination } from "@utils/zod.util";
+import { ZPaginationBody, ZPaginationReq, ZResErrorCommon, ZResOK } from "@utils/zod.util";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import z from "zod";
-import { colorCreate, getColorList } from "./color.controller";
+import { colorCreate, colorUpdate, getColorList } from "./color.controller";
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
 
 
@@ -16,9 +16,9 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Color Get",
         tags: ["Colors"],
-        querystring: ZReqPaginationTyped(ZColor),
+        querystring: ZPaginationReq(ZColor),
         response: {
-          201: ZResOKPagination(ZColor),
+          201: ZResOK(ZPaginationBody(ZColor)),
           400: ZResErrorCommon["400"],
           500: ZResErrorCommon["500"],
         },

@@ -1,5 +1,5 @@
 import { colorTable } from "@db/schemas/color.schema";
-import { ZReqPaginationTyped, ZResOKPagination } from "@utils/zod.util";
+import { ZPaginationBody, ZPaginationReq, ZResOK } from "@utils/zod.util";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
 
@@ -18,8 +18,8 @@ export type TColor = z.infer<typeof ZColor>
 export type TColorRouteCreate = z.infer<typeof ZColorRouteCreate>
 export type TColorRouteUpdate = z.infer<typeof ZColorRouteUpdate>
 
-export const ZColorGetParams = ZReqPaginationTyped(ZColor);
-export const ZColorGetResOK = ZResOKPagination(ZColor);
+export const ZColorGetParams = ZPaginationReq(ZColor);
+export const ZColorGetResOK = ZResOK(ZPaginationBody(ZColor));
 
 export type TColorGetParams = z.infer<typeof ZColorGetParams>
 export type TColorGetResOK = z.infer<typeof ZColorGetResOK>

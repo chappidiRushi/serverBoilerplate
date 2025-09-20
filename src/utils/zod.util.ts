@@ -41,23 +41,19 @@ export type TResError = z.infer<typeof ZResError>
 
 //#region --- Success Response Schemas ---
 
-/** Success response schema for an array of items */
-export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) =>
-  ZResOK(z.array(dataSchema));
-
-/** Bulk operation response schema with success and failed arrays */
-export const ZResBulk = <T extends z.ZodObject>(data: T) =>
-  z.object({
-    success: z.array(data),
-    failed: z.array(data.extend({ reason: z.string().optional() })),
+export function ZBulkBody<T extends z.ZodRawShape>(schema: z.ZodObject<T>) {
+  return z.object({
+    success: z.array(schema),
+    failed: z.array(
+      schema.extend({
+        id: (schema.shape.id && 'optional' in schema.shape.id
+          ? (schema.shape.id as z.ZodTypeAny).optional()
+          : z.any().optional()),
+        reason: z.string(),
+      })
+    ),
   });
-
-/** Success response schema for bulk operations */
-export const ZResBulkOKData = <T extends z.ZodObject>(data: T) => ZResBulk(data)
-export const ZResBulkOK = <T extends z.ZodObject>(data: T) => ZResOK(ZResBulkOKData(data));
-
-//#endregion
-
+}
 //#region --- Error Response Schemas ---
 
 /** Common error response schemas mapped by HTTP status codes */
@@ -86,34 +82,17 @@ export const ZPaginationMeta = z.object({
 export type TPaginationMeta = z.infer<typeof ZPaginationMeta>;
 
 /** Success response schema for paginated data */
-export const ZResOKPagination = <T extends z.ZodTypeAny>(itemSchema: T) =>
-  ZResOK(
-    z.object({
-      items: z.array(itemSchema),
-      pagination: ZPaginationMeta,
-    })
-  );
-
-//#endregion
-
-//#region --- Pagination Request Schemas ---
-
-/** Generic pagination request schema */
-export const ZReqPagination = z.object({
-  page: z.preprocess((val) => Number(val), z.number().int().positive().default(1)),
-  limit: z.preprocess((val) => Number(val), z.number().int().positive().max(100).default(10)),
-  sortBy: z.string().optional(),
-  sortOrder: z.enum(['asc', 'desc']).default('asc'),
-  search: z.string().optional(),
-  filters: z.record(z.string(), z.string()).optional(),
-});
-export type TReqPagination = z.infer<typeof ZReqPagination>;
+export const ZPaginationBody = <T extends z.ZodTypeAny>(itemSchema: T) =>
+  z.object({
+    items: z.array(itemSchema),
+    pagination: ZPaginationMeta,
+  })
 
 /**
  * Generate pagination request schema from a Zod object schema
  * - Only allows sorting/filtering by keys present in the provided schema
  */
-export const ZReqPaginationTyped = <T extends ZodRawShape>(
+export const ZPaginationReq = <T extends ZodRawShape>(
   schema: z.ZodObject<T>
 ) => {
   const keyEnum = schema.keyof();
@@ -128,44 +107,26 @@ export const ZReqPaginationTyped = <T extends ZodRawShape>(
 };
 
 export const ZGetReq = <T extends ZodRawShape>(data: z.ZodObject<T>) =>
-  ZReqPaginationTyped(data);
+  ZPaginationReq(data);
 
 //#endregion
 
 //#region --- Bulk Request Schemas ---
 
-export const ZPostBulkReq = <T extends z.ZodType>(data: T) =>
-  z.object({
-    items: z
-      .array(data)
-      .min(1, "At least one item is required")
-      .max(1000, "Maximum 100 items allowed at once"),
+export const ZBulkReq = <T extends z.ZodType>(data: T) =>z.object({
+    items: z.array(data).min(1, "At least one item is required").max(1000, "Maximum 100 items allowed at once")
   });
 
-export const ZPatchBulkReqItem = <T extends z.ZodType>(data: T) =>
-  z.object({
-    id: z.string().or(z.number()),
-    data: data,
-  });
+export const ZIDNum = z.number()
+export const ZIDNums = z.array(ZIDNum);
 
-export const ZPatchBulkReq = <T extends z.ZodType>(data: T) =>
-  z.object({
-    items: z
-      .array(data)
-      .min(1, "At least one item is required")
-      .max(100, "Maximum 100 items allowed at once"),
-  });
+export const ZIDStr = z.string()
+export const ZIDStrs = z.array(ZIDStr)
 
-//#endregion
-
-//#region --- ID/Bulk Delete Schemas ---
-export const ZID = z.number().or(z.string().regex(/^\d+$/, "ID must be numeric"))
-export const ZIDs = z
-  .array(ZID);
-export const ZDeleteBulkReq = z.object({
-  ids: ZIDs
-    .min(1, "At least one ID is required")
-    .max(100, "Maximum 100 IDs allowed at once"),
+export const ZIdObjStr = z.object({
+  id: z.string()
 });
 
-//#endregion
+export const ZIdObjNum = z.object({
+  id: ZIDNum
+});

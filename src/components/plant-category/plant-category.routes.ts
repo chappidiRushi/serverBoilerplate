@@ -1,27 +1,22 @@
-import { ZResErrorCommon, ZResOK } from "@utils/zod.util";
+import { ZResErrorCommon } from "@utils/zod.util";
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import z from "zod";
-import { PlantCategoryGet, plantCategoryBulkDelete, plantCategoryBulkPatch, plantCategoryBulkPost, plantCategoryDelete, plantCategoryPatch, plantCategoryPost } from "./plant-category.controller";
+import { PlantCategoryBulkDelete, plantCategoryBulkPatch, PlantCategoryDelete, PlantCategoryGet, PlantCategoryPatch, PlantCategoryPost, PlantCategoryPostBulk } from "./plant-category.controller";
 import {
-  ZPlantCategoryBulkDelete,
-  ZPlantCategoryBulkDeleteResOk,
+  ZPlantCategoryBulkDeleteReq,
+  ZPlantCategoryBulkDeleteRes,
+  ZPlantCategoryDeleteReq,
+  ZPlantCategoryDeleteRes,
   ZPlantCategoryGetReq,
   ZPlantCategoryGetRes,
+  ZPlantCategoryPatchBulkReq,
+  ZPlantCategoryPatchBulkRes,
   ZPlantCategoryPatchReq,
   ZPlantCategoryPatchRes,
   ZPlantCategoryPostBulkReq,
   ZPlantCategoryPostBulkRes,
   ZPlantCategoryPostReq,
-  ZPlantCategoryPostRes,
-  ZPlantCategoryRouteBulkPatch,
-  ZPlantCategoryRouteBulkPatchResOK
+  ZPlantCategoryPostRes
 } from "./plant-category.validator";
-
-// Define ID schema explicitly to avoid reference issues
-const ZId = z.object({
-  id: z.string().describe("Plant category ID")
-});
-
 
 
 export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
@@ -66,8 +61,57 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (req, reply) => {
-      const data: DT<typeof ZPlantCategoryPostRes> = await plantCategoryPost(req.body);
+      const data: DT<typeof ZPlantCategoryPostRes> = await PlantCategoryPost(req.body);
       return reply.success(data, 201, "Plant Category Created Successfully");
+    }
+  );
+
+  // PATCH single plant category
+  fastify.patch(
+    "/",
+    {
+      schema: {
+        summary: "Update Plant Category",
+        description: "Update an existing plant category by ID",
+        tags: ["Plant Categories"],
+        // params: ZId,
+        body: ZPlantCategoryPatchReq,
+        response: {
+          200: ZPlantCategoryPatchRes,
+          400: ZResErrorCommon["400"],
+          404: ZResErrorCommon["404"],
+          500: ZResErrorCommon["500"],
+        },
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (req, reply) => {
+      // const id = req.params.id;
+      const updatedPlantCategory: DT<typeof ZPlantCategoryPatchRes> = await PlantCategoryPatch(req.body);
+      return reply.success(updatedPlantCategory, 200, "Plant Category Updated Successfully");
+    }
+  );
+
+  fastify.delete(
+    "/:id",
+    {
+      schema: {
+        summary: "Delete Plant Category",
+        description: "Delete a plant category by ID",
+        tags: ["Plant Categories"],
+        params: ZPlantCategoryDeleteReq,
+        response: {
+          200: ZPlantCategoryDeleteRes,
+          400: ZResErrorCommon["400"],
+          404: ZResErrorCommon["404"],
+          500: ZResErrorCommon["500"],
+        },
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (req, reply) => {
+      const result = await PlantCategoryDelete(req.params);
+      return reply.success(result, 200, "Plant Category Deleted Successfully");
     }
   );
 
@@ -89,36 +133,11 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (req, reply) => {
-      const result: DT<typeof ZPlantCategoryPostBulkRes> = await plantCategoryBulkPost(req.body);
+      const result: DT<typeof ZPlantCategoryPostBulkRes> = await PlantCategoryPostBulk(req.body);
       return reply.success(result, 201, "Plant Categories Created Successfully");
     }
   );
 
-  // PATCH single plant category
-  fastify.patch(
-    "/:id",
-    {
-      schema: {
-        summary: "Update Plant Category",
-        description: "Update an existing plant category by ID",
-        tags: ["Plant Categories"],
-        params: ZId,
-        body: ZPlantCategoryPatchReq.omit({ id: true }),
-        response: {
-          200: ZPlantCategoryPatchRes,
-          400: ZResErrorCommon["400"],
-          404: ZResErrorCommon["404"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const id = req.params.id;
-      const updatedPlantCategory: DT<typeof ZPlantCategoryPatchRes> = await plantCategoryPatch(req.body, id);
-      return reply.success(updatedPlantCategory, 200, "Plant Category Updated Successfully");
-    }
-  );
 
   // PATCH bulk plant categories
   fastify.patch(
@@ -128,9 +147,9 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Update Multiple Plant Categories",
         description: "Update multiple plant categories in a single request",
         tags: ["Plant Categories"],
-        body: ZPlantCategoryRouteBulkPatch,
+        body: ZPlantCategoryPatchBulkReq,
         response: {
-          200: ZPlantCategoryRouteBulkPatchResOK,
+          200: ZPlantCategoryPatchBulkRes,
           400: ZResErrorCommon["400"],
           404: ZResErrorCommon["404"],
           500: ZResErrorCommon["500"],
@@ -145,29 +164,6 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
   );
 
   // DELETE single plant category
-  fastify.delete(
-    "/:id",
-    {
-      schema: {
-        summary: "Delete Plant Category",
-        description: "Delete a plant category by ID",
-        tags: ["Plant Categories"],
-        params: ZId,
-        response: {
-          200: ZResOK(z.object({ id: z.string() })),
-          400: ZResErrorCommon["400"],
-          404: ZResErrorCommon["404"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const id = req.params.id;
-      const result = await plantCategoryDelete(id);
-      return reply.success(result, 200, "Plant Category Deleted Successfully");
-    }
-  );
 
   // DELETE bulk plant categories
   fastify.delete(
@@ -177,9 +173,9 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
         summary: "Delete Multiple Plant Categories",
         description: "Delete multiple plant categories by their IDs",
         tags: ["Plant Categories"],
-        body: ZPlantCategoryBulkDelete,
+        body: ZPlantCategoryBulkDeleteReq,
         response: {
-          209: ZPlantCategoryBulkDeleteResOk,
+          209: ZPlantCategoryBulkDeleteRes,
           400: ZResErrorCommon["400"],
           404: ZResErrorCommon["404"],
           500: ZResErrorCommon["500"],
@@ -188,7 +184,7 @@ export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (req, reply) => {
-      const result: DT<typeof ZPlantCategoryBulkDeleteResOk> = await plantCategoryBulkDelete(req.body);
+      const result: DT<typeof ZPlantCategoryBulkDeleteRes> = await PlantCategoryBulkDelete(req.body);
       return reply.success(result, 209, "Plant Categories Deleted Successfully");
     }
   );

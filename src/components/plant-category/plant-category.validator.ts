@@ -2,13 +2,13 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
 import { plantCategoryTable } from "../../db/schemas/plant_category.shema";
 import {
-  ZDeleteBulkReq,
+  ZBulkBody,
+  ZBulkReq,
   ZGetReq,
-  ZPatchBulkReq,
-  ZPostBulkReq,
-  ZResBulkOK,
-  ZResOK,
-  ZResOKPagination
+  ZIDNum,
+  ZIdObjStr,
+  ZPaginationBody,
+  ZResOK
 } from "../../utils/zod.util";
 
 // -------------------------------------
@@ -46,7 +46,7 @@ export const ZPlantCategoryAPi = ZPlantCategoryOriginal.omit({
 
 // GET
 export const ZPlantCategoryGetReq = ZGetReq(ZPlantCategoryAPi);
-export const ZPlantCategoryGetRes = ZResOKPagination(ZPlantCategoryAPi);
+export const ZPlantCategoryGetRes = ZResOK(ZPaginationBody(ZPlantCategoryAPi));
 
 // POST (single)
 export const ZPlantCategoryPostReq = ZPlantCategoryAPi.omit({ id: true });
@@ -56,31 +56,23 @@ export const ZPlantCategoryPostRes = ZResOK(ZPlantCategoryAPi);
 export const ZPlantCategoryPatchReq = ZPlantCategoryAPi.partial().required({ id: true });
 export const ZPlantCategoryPatchRes = ZResOK(ZPlantCategoryAPi);
 
+// DELETE (single)
+export const ZPlantCategoryDeleteReq = ZIdObjStr;
+export const ZPlantCategoryDeleteRes = ZResOK(ZIdObjStr);
+
+
 // -------------------------------------
 // Bulk Actions
 // -------------------------------------
 
 // POST (bulk)
-export const ZPlantCategoryPostBulkReq = ZPostBulkReq(ZPlantCategoryPostReq);
-export const ZPlantCategoryPostBulkRes = ZResBulkOK(ZPlantCategoryAPi);
+export const ZPlantCategoryPostBulkReq = ZBulkReq(ZPlantCategoryPostReq);
+export const ZPlantCategoryPostBulkRes = ZResOK(ZBulkBody(ZPlantCategoryAPi));
 
 // PATCH (bulk)
-export const ZPlantCategoryRouteBulkPatch = ZPatchBulkReq(ZPlantCategoryPatchReq);
-export const ZPlantCategoryRouteBulkPatchResOK = ZResBulkOK(ZPlantCategoryAPi);
+export const ZPlantCategoryPatchBulkReq = ZBulkReq(ZPlantCategoryPatchReq);
+export const ZPlantCategoryPatchBulkRes = ZResOK(ZBulkBody(ZPlantCategoryAPi.partial()));
 
 // DELETE (bulk)
-export const ZPlantCategoryBulkDelete = ZDeleteBulkReq;
-export const ZPlantCategoryBulkDeleteResOk = ZResBulkOK(z.object({ id: z.number() }));
-
-// -------------------------------------
-// Types (auto from schemas)
-// -------------------------------------
-export type TPlantCategory = z.infer<typeof ZPlantCategoryOriginal>;
-export type TPlantCategoryGetParams = z.infer<typeof ZPlantCategoryGetReq>;
-
-export type TPlantCategoryRoutePost = z.infer<typeof ZPlantCategoryPostReq>;
-export type TPlantCategoryRoutePatch = z.infer<typeof ZPlantCategoryPatchReq>;
-
-export type TPlantCategoryRouteBulkPost = z.infer<typeof ZPlantCategoryPostBulkReq>;
-export type TPlantCategoryRouteBulkPatch = z.infer<typeof ZPlantCategoryRouteBulkPatch>;
-export type TPlantCategoryBulkDelete = z.infer<typeof ZPlantCategoryBulkDelete>;
+export const ZPlantCategoryBulkDeleteReq = ZBulkReq(ZIDNum);
+export const ZPlantCategoryBulkDeleteRes = ZResOK(ZBulkBody(ZIdObjStr));
