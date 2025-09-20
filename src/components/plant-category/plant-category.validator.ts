@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
-import { plantCategoryTable } from "../../db/schemas/plant_category.shema";
+import { plantCategoryTable } from "../../db/schemas/plant_category.schema";
 import {
   ZBulkBody,
   ZBulkReq,

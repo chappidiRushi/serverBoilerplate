@@ -1,9 +1,8 @@
-import { plantCategoryTable } from "@db/schemas/plant_category.shema";
+import { plantCategoryTable } from "@db/schemas/plant_category.schema";
 import { now } from "@utils/helpers.util";
 import { applyFilters, applySearch, applySorting, buildPaginationMeta, getOffset } from "@utils/query.util";
 import { eq, sql } from "drizzle-orm";
 import z from "zod";
-import { id } from "zod/locales";
 import {
   ZPlantCategoryBulkDeleteReq,
   ZPlantCategoryBulkDeleteRes,
@@ -85,7 +84,7 @@ export const PlantCategoryPatch = async function (input: z.infer<typeof ZPlantCa
     .limit(1);
 
   if (!existingPlantCategory)
-    throw CE.NOT_FOUND_404(`Plant Category with ID ${id} not found`);
+    throw CE.NOT_FOUND_404(`Plant Category with ID ${input.id} not found`);
 
   // If name is being updated, check uniqueness
   if (input.name && input.name !== existingPlantCategory.name) {
@@ -98,12 +97,12 @@ export const PlantCategoryPatch = async function (input: z.infer<typeof ZPlantCa
     if (nameExists)
       throw CE.BAD_REQUEST_400(`Plant Category with name "${input.name}" already exists`);
   }
-
+  const { id, ...input1 } = input;
   // Update plant category
   const [updatedPlantCategory] = await db
     .update(plantCategoryTable)
     .set({
-      ...input,
+      ...input1,
       updatedAt: now(),
     })
     .where(eq(plantCategoryTable.id, Number(id)))
