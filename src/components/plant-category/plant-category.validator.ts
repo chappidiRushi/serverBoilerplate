@@ -1,82 +1,89 @@
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import z from "zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { plantCategoryTable } from "../../db/schemas/plant_category.shema";
-import { ZReqPaginationTyped, ZResOK, ZResOkArr, ZResOKPagination } from "../../utils/zod.util";
-
-const nameRule = (s: z.ZodString) => s.min(1, "Name is required").max(100, "Name must be at most 100 characters");
-
-const descriptionRule = (s: z.ZodString) => s.max(5000, "Description must be at most 255 characters").optional();
-
-const mediaUrlRule = (s: z.ZodString) => s.url("Media URL must be a valid URL").optional();
+import {
+  ZDeleteBulkReq,
+  ZGetReq,
+  ZIDs,
+  ZPatchBulkReq,
+  ZPostBulkReq,
+  ZResBulkOK,
+  ZResOK,
+  ZResOKPagination
+} from "../../utils/zod.util";
 
 // -------------------------------------
-// Schemas
+// Field Rules
 // -------------------------------------
+const nameRule = (s: z.ZodString) =>
+  s.min(1, "Name is required").max(100, "Name must be at most 100 characters");
 
+const descriptionRule = (s: z.ZodString) =>
+  s.max(5000, "Description must be at most 255 characters").optional();
 
-// Full table schema (for DB select / response)
-export const ZPlantCategory = createSelectSchema(plantCategoryTable, {
+const mediaUrlRule = (s: z.ZodString) =>
+  s.url("Media URL must be a valid URL").optional();
+
+// -------------------------------------
+// Table Schemas
+// -------------------------------------
+export const ZPlantCategoryOriginal = createSelectSchema(plantCategoryTable, {
   name: nameRule,
   description: descriptionRule,
   mediaUrl: mediaUrlRule,
-  // createdAt: (s) => s,
-  // updatedAt: (s) => s,
-  deletedAt: (s) => s.nullable().optional(), // z.date().nullable().optional()
+  deletedAt: (s) => s.nullable().optional(),
 });
+
 export const ZPlantCategoryInsert = createInsertSchema(plantCategoryTable, {
   name: nameRule,
   description: descriptionRule,
   mediaUrl: mediaUrlRule,
 });
 
-
-export const ZPlantCategoryGetParams = ZReqPaginationTyped(ZPlantCategory);
-export const ZPlantCategoryGetResOK = ZResOKPagination(ZPlantCategory);
-
-
-export const ZPlantCategoryRoutePost = ZPlantCategoryInsert.pick({ name: true, description: true, publicId: true, mediaUrl: true, });
-export const ZPlantCategoryRoutePostResOK = ZResOK(ZPlantCategory)
-
-export const ZPlantCategoryRouteBulkPost = z.object({
-  items: z.array(ZPlantCategoryRoutePost).min(1, "At least one item is required").max(1000, "Maximum 100 items allowed at once")
+export const ZPlantCategoryAPi = ZPlantCategoryOriginal.omit({
+  createdAt: true,
+  deletedAt: true,
+  updatedAt: true,
 });
 
-export const ZPlantCategoryRoutePostBulkResOK = ZResOkArr(ZPlantCategory)
+// -------------------------------------
+// API Schemas
+// -------------------------------------
 
+// GET
+export const ZPlantCategoryGet = ZGetReq(ZPlantCategoryAPi);
+export const ZPlantCategoryGetResOK = ZResOKPagination(ZPlantCategoryAPi);
 
-export const ZPlantCategoryRoutePatch = ZPlantCategoryRoutePost.partial();
-export const ZPlantCategoryRoutePatchResOK = ZResOK(ZPlantCategory);
-export const ZPlantCategoryBulkPatchItem = z.object({
-  id: z.string().or(z.number()),
-  data: ZPlantCategoryRoutePatch
-});
-export const ZPlantCategoryRouteBulkPatch = z.object({
-  items: z.array(ZPlantCategoryBulkPatchItem).min(1, "At least one item is required").max(100, "Maximum 100 items allowed at once")
-});
-export const ZPlantCategoryRouteBulkPatchResOK = ZResOkArr(ZPlantCategory)
+// POST (single)
+export const ZPlantCategoryRoutePost = ZPlantCategoryAPi.omit({ id: true });
+export const ZPlantCategoryRoutePostResOK = ZResOK(ZPlantCategoryAPi);
 
-// Bulk delete schema
-export const ZPlantCategoryBulkDeleteIds = z.object({
-  ids: z.array(z.number().or(z.string().regex(/^\d+$/, "ID must be numeric")))
-    .min(1, "At least one ID is required")
-    .max(100, "Maximum 100 IDs allowed at once")
-});
+// POST (bulk)
+export const ZPlantCategoryRoutePostBulk = ZPostBulkReq(ZPlantCategoryRoutePost);
+export const ZPlantCategoryRoutePostBulkResOK = ZResBulkOK(ZPlantCategoryAPi);
+
+// PATCH (single)
+export const ZPlantCategoryRoutePatch = ZPlantCategoryAPi.partial().required({ id: true });
+export const ZPlantCategoryRoutePatchResOK = ZResOK(ZPlantCategoryAPi);
+
+// PATCH (bulk)
+export const ZPlantCategoryRouteBulkPatch = ZPatchBulkReq(ZPlantCategoryRoutePatch);
+export const ZPlantCategoryRouteBulkPatchResOK = ZResBulkOK(ZPlantCategoryAPi);
+
+// DELETE (bulk)
+export const ZPlantCategoryBulkDelete = ZDeleteBulkReq;
+export const ZPlantCategoryBulkDeleteResOk = ZResBulkOK(ZIDs);
 
 // -------------------------------------
 // Types (auto from schemas)
 // -------------------------------------
-export type TPlantCategory = z.infer<typeof ZPlantCategory>;
-
-export type TPlantCategoryGetParams = z.infer<typeof ZPlantCategoryGetParams>;
-
+export type TPlantCategory = z.infer<typeof ZPlantCategoryOriginal>;
+export type TPlantCategoryGetParams = z.infer<typeof ZPlantCategoryGet>;
 
 export type TPlantCategoryRoutePost = z.infer<typeof ZPlantCategoryRoutePost>;
-export type TPlantCategoryRouteBulkPost = z.infer<typeof ZPlantCategoryRouteBulkPost>;
+export type TPlantCategoryRouteBulkPost = z.infer<typeof ZPlantCategoryRoutePostBulk>;
 
-export type TPlantCategoryRouteUpdate = z.infer<typeof ZPlantCategoryRoutePatch>;
-export type TPlantCategoryRouteBulkUpdate = z.infer<typeof ZPlantCategoryRouteBulkPatch>;
+export type TPlantCategoryRoutePatch = z.infer<typeof ZPlantCategoryRoutePatch>;
+export type TPlantCategoryRouteBulkPatch = z.infer<typeof ZPlantCategoryRouteBulkPatch>;
 
-export type TPlantCategoryBulkDelete = z.infer<typeof ZPlantCategoryBulkDeleteIds>;
-
-
-
+export type TPlantCategoryBulkDelete = z.infer<typeof ZPlantCategoryBulkDelete>;

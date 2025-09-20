@@ -1,103 +1,151 @@
 import { z, ZodRawShape } from 'zod';
 
-// Utility to generate a standard response schema with a given status (true/false)
-export const ZResBoilerplate = (status: boolean) => {
-  return z.object({
-    status: z.literal(status), // Response status (true/false)
-    message: z.string(), // Message string
+//#region --- Response Boilerplate ---
+
+/** Standard response schema with a given status (true/false) */
+export const ZResBoilerplate = (status: boolean) =>
+  z.object({
+    status: z.literal(status),
+    message: z.string(),
     meta: z.object({
-      timestamp: z.string(), // Timestamp of the response
-      requestId: z.string(), // Unique request identifier
+      timestamp: z.string(),
+      requestId: z.string(),
     }),
-  })
-}
+  });
 
-// Success response schema with a data field of generic type
-export const ZResOK = <T extends z.ZodTypeAny>(data: T) => ZResBoilerplate(true).extend({
-  data: data // Data payload
-})
+//#endregion
 
-// Error response schema with code and optional details
-export const ZResError = <T extends z.ZodTypeAny>(data: T) => ZResBoilerplate(false).extend({
-  code: z.union([z.string(), z.number()]), // Error code (string or number)
-  details: z.any().optional(), // Optional error details
-})
+//#region --- Success Response Schemas ---
 
-// Success response schema for an array of items
-export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) => ZResOK(z.array(dataSchema))
+/** Success response schema with a data field of generic type */
+export const ZResOK = <T extends z.ZodTypeAny>(data: T) =>
+  ZResBoilerplate(true).extend({ data });
 
-// Bulk operation response schema with success and failed arrays
-export const ZResBulk = <T extends z.ZodTypeAny>(data: T) => {
-  return z.object({
-    success: z.array(data), // Successfully processed items
-    failed: z.array(data)   // Failed items
-  })
-}
+/** Success response schema for an array of items */
+export const ZResOkArr = <T extends z.ZodTypeAny>(dataSchema: T) =>
+  ZResOK(z.array(dataSchema));
 
-// Success response schema for bulk operations
-export const ZResBulkOK = <T extends z.ZodTypeAny>(data: T) => ZResOK(ZResBulk(data))
+/** Bulk operation response schema with success and failed arrays */
+export const ZResBulk = <T extends z.ZodTypeAny>(data: T) =>
+  z.object({
+    success: z.array(data),
+    failed: z.array(data),
+  });
 
-// Pagination metadata schema
-export const ZPaginationMeta = z.object({
-  total: z.number().int().nonnegative(),      // Total items
-  page: z.number().int().positive(),          // Current page number
-  limit: z.number().int().positive(),         // Items per page
-  totalPages: z.number().int().nonnegative(), // Total number of pages
-  hasNextPage: z.boolean(),                   // Is there a next page?
-  hasPrevPage: z.boolean(),                   // Is there a previous page?
-})
+/** Success response schema for bulk operations */
+export const ZResBulkOK = <T extends z.ZodTypeAny>(data: T) =>
+  ZResOK(ZResBulk(data));
 
-export type TPaginationMeta = z.infer<typeof ZPaginationMeta>
+//#endregion
 
-// Success response schema for paginated data
-export const ZResOKPagination = <T extends z.ZodTypeAny>(itemSchema: T) =>
-  ZResOK(
-    z.object({
-      items: z.array(itemSchema),    // Array of items
-      pagination: ZPaginationMeta,   // Pagination metadata
-    })
-  );
+//#region --- Error Response Schemas ---
 
-// Common error response schemas mapped by HTTP status codes
+/** Error response schema with code and optional details */
+export const ZResError = () =>
+  ZResBoilerplate(false).extend({
+    code: z.union([z.string(), z.number()]),
+    details: z.any().optional(),
+  });
+
+/** Common error response schemas mapped by HTTP status codes */
 export const ZResErrorCommon = {
   400: ZResError,
   401: ZResError,
   403: ZResError,
   404: ZResError,
-  409: ZResError,
-  500: ZResError
-} as const
+  // 409: ZResError,
+  500: ZResError,
+} as const;
 
-// Generic pagination request schema
-export const ZReqPagination = z.object({
-  page: z
-    .preprocess((val) => Number(val), z.number().int().positive().default(1)), // Page number
-  limit: z
-    .preprocess((val) => Number(val), z.number().int().positive().max(100).default(10)), // Items per page
-  sortBy: z.string().optional(), // Field to sort by
-  sortOrder: z.enum(["asc", "desc"]).default("asc"), // Sort order
-  search: z.string().optional(), // Search/filter keyword
-  filters: z.record(z.string(), z.string()).optional(), // Key-value filters
+//#endregion
+
+//#region --- Pagination Schemas ---
+
+/** Pagination metadata schema */
+export const ZPaginationMeta = z.object({
+  total: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
+  limit: z.number().int().positive(),
+  totalPages: z.number().int().nonnegative(),
+  hasNextPage: z.boolean(),
+  hasPrevPage: z.boolean(),
 });
+export type TPaginationMeta = z.infer<typeof ZPaginationMeta>;
 
-export type TReqPagination = z.infer<typeof ZReqPagination>
+/** Success response schema for paginated data */
+export const ZResOKPagination = <T extends z.ZodTypeAny>(itemSchema: T) =>
+  ZResOK(
+    z.object({
+      items: z.array(itemSchema),
+      pagination: ZPaginationMeta,
+    })
+  );
+
+//#endregion
+
+//#region --- Pagination Request Schemas ---
+
+/** Generic pagination request schema */
+export const ZReqPagination = z.object({
+  page: z.preprocess((val) => Number(val), z.number().int().positive().default(1)),
+  limit: z.preprocess((val) => Number(val), z.number().int().positive().max(100).default(10)),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(['asc', 'desc']).default('asc'),
+  search: z.string().optional(),
+  filters: z.record(z.string(), z.string()).optional(),
+});
+export type TReqPagination = z.infer<typeof ZReqPagination>;
 
 /**
  * Generate pagination request schema from a Zod object schema
  * - Only allows sorting/filtering by keys present in the provided schema
  */
+
+//#endregion
+
+
+
 export const ZReqPaginationTyped = <T extends ZodRawShape>(
   schema: z.ZodObject<T>
 ) => {
-  const keyEnum = schema.keyof(); // Enum of schema keys
+  const keyEnum = schema.keyof();
   return z.object({
-    page: z
-      .preprocess((val) => Number(val), z.number().int().positive().default(1)),
-    limit: z
-      .preprocess((val) => Number(val), z.number().int().positive().max(100).default(10)),
-    sortBy: keyEnum.optional(), // Only schema keys allowed
-    sortOrder: z.enum(["asc", "desc"]).default("asc"),
+    page: z.preprocess((val) => Number(val), z.number().int().positive().default(1)),
+    limit: z.preprocess((val) => Number(val), z.number().int().positive().max(100).default(10)),
+    sortBy: keyEnum.optional(),
+    sortOrder: z.enum(['asc', 'desc']).default('asc'),
     search: z.string().optional(),
-    filters: z.record(keyEnum, z.string()).optional(), // Filters must use schema keys
+    filters: z.record(keyEnum, z.string()).optional(),
   });
 };
+
+
+export const ZGetReq = <T extends ZodRawShape>(data: z.ZodObject<T>) => ZReqPaginationTyped(data)
+
+export const ZPostBulkReq = <T extends z.ZodType>(data: T) => z.object({
+  items: z
+    .array(data)
+    .min(1, "At least one item is required")
+    .max(1000, "Maximum 100 items allowed at once"),
+});
+
+export const ZPatchBulkReqItem = <T extends z.ZodType>(data: T) => z.object({
+  id: z.string().or(z.number()),
+  data: data,
+});
+
+export const ZPatchBulkReq = <T extends z.ZodType>(data: T) => z.object({
+  items: z
+    .array(data)
+    .min(1, "At least one item is required")
+    .max(100, "Maximum 100 items allowed at once"),
+})
+
+export const ZIDs = z
+  .array(z.number().or(z.string().regex(/^\d+$/, "ID must be numeric")))
+
+export const ZDeleteBulkReq = z.object({
+  ids: ZIDs
+    .min(1, "At least one ID is required")
+    .max(100, "Maximum 100 IDs allowed at once"),
+})

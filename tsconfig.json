@@ -13,6 +13,9 @@
       "@config/*": [
         "config/*"
       ],
+      "@components/*": [
+        "components/*"
+      ],
       "@routes/*": [
         "routes/*"
       ],
