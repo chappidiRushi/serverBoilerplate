@@ -7,9 +7,13 @@ import { swagger } from '@elysiajs/swagger';
 import { config } from './config/env.config';
 import { logger } from './config/logger.config';
 import { errorHandler } from './middleware/errorHandler.middleware';
+import { jwtAuthMiddleware } from './middleware/auth.middleware';
 import { successResponse } from './utils/response.util';
 import { UserRouteCreateSchema, UserRouteLoginReq } from './components/user/user.validator';
 import { UserCreate, UserLogin } from './components/user/user.controller';
+import { colorRoute } from './components/color/color.routes';
+import { plantCategoryRoute } from './components/plant-category/plant-category.routes';
+import { FertilizerRoute } from './components/fertilizers/fertilizer.routes';
 
 const app = new Elysia()
   .onError(({ error, set }) => {
@@ -95,6 +99,15 @@ const app = new Elysia()
           }
         }
       )
+  )
+  .group('/api/color', (app) => 
+    app.use(jwtAuthMiddleware).use(colorRoute)
+  )
+  .group('/api/plant-category', (app) => 
+    app.use(jwtAuthMiddleware).use(plantCategoryRoute)
+  )
+  .group('/api/fertilizer', (app) => 
+    app.use(jwtAuthMiddleware).use(FertilizerRoute)
   );
 
 const start = async () => {

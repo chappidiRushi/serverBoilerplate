@@ -9,7 +9,7 @@ export interface AuthenticatedUser {
   lastName?: string;
 }
 
-const publicRoutePatterns = [/^\/login$/, /^\/register$/, /^\/swagger(\/.*)?$/, /^\/health$/];
+const publicRoutePatterns = [/^\/login$/, /^\/register$/, /^\/swagger(\/.*)?$/, /^\/health$/, /^\/$/];
 
 export const jwtAuthMiddleware = new Elysia()
   .use(
@@ -22,20 +22,34 @@ export const jwtAuthMiddleware = new Elysia()
     const url = request.url;
     const pathname = new URL(url).pathname;
     
-    if (publicRoutePatterns.some((pattern) => pattern.test(pathname))) {
+    // Remove API prefix for pattern matching
+    const routePath = pathname.replace(/^\/api\/[^\/]+/, '');
+    
+    if (publicRoutePatterns.some((pattern) => pattern.test(routePath))) {
       return {};
     }
 
     const authorization = headers['authorization'];
     if (!authorization || !authorization.startsWith('Bearer ')) {
-      throw new Error('Unauthorized');
+      throw new Error('Unauthorized: No valid token provided');
     }
 
     const token = authorization.substring(7);
     try {
-      const user = await jwt.verify(token) as AuthenticatedUser;
+      const payload = await jwt.verify(token);
+      if (!payload || typeof payload !== 'object') {
+        throw new Error('Invalid token payload');
+      }
+      
+      const user: AuthenticatedUser = {
+        id: payload.userId || payload.id,
+        email: payload.email,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+      };
+      
       return { user };
     } catch (err) {
-      throw new Error('Unauthorized');
+      throw new Error('Unauthorized: Invalid or expired token');
     }
   });

@@ -1,95 +1,82 @@
 import { ZPaginationBody, ZPaginationReq, ZResErrorCommon, ZResOK } from "@utils/zod.util";
-import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { Elysia, t } from "elysia";
+import { jwt } from '@elysiajs/jwt';
+import { config } from '../../config/env.config';
 import z from "zod";
 import { colorCreate, colorUpdate, getColorList } from "./color.controller";
 import { ZColor, ZColorRouteCreate, ZColorRouteUpdate } from "./color.validator";
-
+import { successResponse } from "../../utils/response.util";
 
 const ZId = z.object({
-  id: z.number()
-})
+  id: z.coerce.number()
+});
 
-export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
-  fastify.get(
+export const colorRoute = new Elysia()
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: config.JWT_SECRET
+    })
+  )
+  .get(
     "/",
+    async ({ query }) => {
+      const data = await getColorList(query);
+      return successResponse(data, 201, "Colors Fetched Successfully");
+    },
     {
-      schema: {
+      query: ZPaginationReq(ZColor),
+      detail: {
         summary: "Color Get",
         tags: ["Colors"],
-        querystring: ZPaginationReq(ZColor),
-        response: {
-          201: ZResOK(ZPaginationBody(ZColor)),
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const data = await getColorList(req.query)
-      return reply.success(data, 201, "Colors Fetched Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-  fastify.post(
+  )
+  .post(
     "/",
+    async ({ body }) => {
+      const newColor = await colorCreate(body);
+      return successResponse(newColor, 201, "Color Created Successfully");
+    },
     {
-      schema: {
+      body: ZColorRouteCreate,
+      detail: {
         summary: "Color Create",
-        body: ZColorRouteCreate,
-        response: {
-          201: ZResOK(ZColor),
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      // const newUser = await UserCreate(req.body);
-      const newColor = await colorCreate(req.body);
-      return reply.success(newColor, 201, "Color Created Successfully");
+        tags: ["Colors"],
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-  fastify.patch(
+  )
+  .patch(
     "/:id",
+    async ({ params, body }) => {
+      const id = params.id;
+      const updatedColor = await colorUpdate(body, id);
+      return successResponse(updatedColor, 200, "Color Updated Successfully");
+    },
     {
-      schema: {
-        params: ZId,
+      params: ZId,
+      body: ZColorRouteUpdate,
+      detail: {
         summary: "Color Update",
-        body: ZColorRouteUpdate,
-        response: {
-          200: ZResOK(ZColor),
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      // const replyData = await UserLogin(req.body, reply);
-      const id = req.params.id
-      const updatedColor = await colorUpdate(req.body, id)
-      // // logger.info("user crated", newUser);
-      return reply.success(updatedColor, 200, "Color Updated Successfully");
+        tags: ["Colors"],
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-  fastify.delete(
+  )
+  .delete(
     "/:id",
-    {
-      schema: {
-        params: ZId,
-        summary: "Color Delete",
-        response: {
-          200: ZResOK(ZId),
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
+    async ({ params }) => {
+      const id = params.id;
+      return successResponse({ id }, 200, "Color Deleted Successfully");
     },
-    async (req, reply) => {
-      const id = req.params.id;
-      return reply.success({ id }, 200, "Color Deleted Successfully");
+    {
+      params: ZId,
+      detail: {
+        summary: "Color Delete",
+        tags: ["Colors"],
+        security: [{ bearerAuth: [] }]
+      }
     }
   );
-};

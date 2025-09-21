@@ -1,4 +1,6 @@
-import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { Elysia } from "elysia";
+import { jwt } from '@elysiajs/jwt';
+import { config } from '../../config/env.config';
 import { FertilizerBulkDelete, FertilizerBulkPatch, FertilizerDelete, FertilizerGet, FertilizerPatch, FertilizerPost, FertilizerPostBulk } from "./fertilizer.controller";
 import {
   ZFertilizerBulkDeleteReq,
@@ -16,175 +18,131 @@ import {
   ZFertilizerPostReq,
   ZFertilizerPostRes
 } from "./fertilizer.validator";
+import { successResponse } from "../../utils/response.util";
 
-
-export const FertilizerRoute: FastifyPluginAsyncZod = async (fastify) => {
+export const FertilizerRoute = new Elysia()
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: config.JWT_SECRET
+    })
+  )
   // GET all fertilizer
-  fastify.get(
+  .get(
     "/",
+    async ({ query }) => {
+      const data: DT<typeof ZFertilizerGetRes> = await FertilizerGet(query);
+      return successResponse(data, 200, "Fertilizer Fetched Successfully");
+    },
     {
-      schema: {
+      query: ZFertilizerGetReq,
+      detail: {
         summary: "Get Fertilizer",
         description: "Retrieve a paginated list of fertilizer",
         tags: ["Fertilizer"],
-        querystring: ZFertilizerGetReq,
-        response: {
-          200: ZFertilizerGetRes,
-          // 400: ZResErrorCommon["400"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const data: DT<typeof ZFertilizerGetRes> = await FertilizerGet(req.query);
-      return reply.success(data, 200, "Fertilizer Fetched Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
+  )
   // POST single fertilizer
-  fastify.post(
+  .post(
     "/",
+    async ({ body }) => {
+      const data: DT<typeof ZFertilizerPostRes> = await FertilizerPost(body);
+      return successResponse(data, 201, "Fertilizer Created Successfully");
+    },
     {
-      schema: {
+      body: ZFertilizerPostReq,
+      detail: {
         summary: "Create Fertilizer",
         description: "Create a new fertilizer",
         tags: ["Fertilizer"],
-        body: ZFertilizerPostReq,
-        response: {
-          201: ZFertilizerPostRes,
-          // 400: ZResErrorCommon["400"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const data: DT<typeof ZFertilizerPostRes> = await FertilizerPost(req.body);
-      return reply.success(data, 201, "Fertilizer Created Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
+  )
   // PATCH single fertilizer
-  fastify.patch(
+  .patch(
     "/",
+    async ({ body }) => {
+      const updatedFertilizer: DT<typeof ZFertilizerPatchRes> = await FertilizerPatch(body);
+      return successResponse(updatedFertilizer, 200, "Fertilizer Updated Successfully");
+    },
     {
-      schema: {
+      body: ZFertilizerPatchReq,
+      detail: {
         summary: "Update Fertilizer",
         description: "Update an existing fertilizer by ID",
         tags: ["Fertilizer"],
-        // params: ZId,
-        body: ZFertilizerPatchReq,
-        response: {
-          200: ZFertilizerPatchRes,
-          // 400: ZResErrorCommon["400"],
-          // 404: ZResErrorCommon["404"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      // const id = req.params.id;
-      const updatedFertilizer: DT<typeof ZFertilizerPatchRes> = await FertilizerPatch(req.body);
-      return reply.success(updatedFertilizer, 200, "Fertilizer Updated Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
-  fastify.delete(
+  )
+  // DELETE single fertilizer
+  .delete(
     "/:id",
+    async ({ params }) => {
+      const result = await FertilizerDelete(params);
+      return successResponse(result, 200, "Fertilizer Deleted Successfully");
+    },
     {
-      schema: {
+      params: ZFertilizerDeleteReq,
+      detail: {
         summary: "Delete Fertilizer",
         description: "Delete a fertilizer by ID",
         tags: ["Fertilizer"],
-        params: ZFertilizerDeleteReq,
-        response: {
-          200: ZFertilizerDeleteRes,
-          // 400: ZResErrorCommon["400"],
-          // 404: ZResErrorCommon["404"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result = await FertilizerDelete(req.params);
-      return reply.success(result, 200, "Fertilizer Deleted Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
+  )
   // POST bulk fertilizer
-  fastify.post(
+  .post(
     "/bulk",
+    async ({ body }) => {
+      const result: DT<typeof ZFertilizerPostBulkRes> = await FertilizerPostBulk(body);
+      return successResponse(result, 201, "Fertilizer Created Successfully");
+    },
     {
-      schema: {
+      body: ZFertilizerPostBulkReq,
+      detail: {
         summary: "Create Multiple Fertilizer",
         description: "Create multiple fertilizer in a single request",
         tags: ["Fertilizer"],
-        body: ZFertilizerPostBulkReq,
-        response: {
-          201: ZFertilizerPostBulkRes,
-          // 400: ZResErrorCommon["400"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result: DT<typeof ZFertilizerPostBulkRes> = await FertilizerPostBulk(req.body);
-      return reply.success(result, 201, "Fertilizer Created Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
-
+  )
   // PATCH bulk fertilizer
-  fastify.patch(
+  .patch(
     "/bulk",
+    async ({ body }) => {
+      const result = await FertilizerBulkPatch(body);
+      return successResponse(result, 200, "Fertilizer Updated Successfully");
+    },
     {
-      schema: {
+      body: ZFertilizerPatchBulkReq,
+      detail: {
         summary: "Update Multiple Fertilizer",
         description: "Update multiple fertilizer in a single request",
         tags: ["Fertilizer"],
-        body: ZFertilizerPatchBulkReq,
-        response: {
-          200: ZFertilizerPatchBulkRes,
-          // 400: ZResErrorCommon["400"],
-          // 404: ZResErrorCommon["404"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result = await FertilizerBulkPatch(req.body);
-      return reply.success(result, 200, "Fertilizer Updated Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
-  // DELETE single fertilizer
-
+  )
   // DELETE bulk fertilizer
-  fastify.delete(
+  .delete(
     "/bulk",
+    async ({ body }) => {
+      const result: DT<typeof ZFertilizerBulkDeleteRes> = await FertilizerBulkDelete(body);
+      return successResponse(result, 209, "Fertilizer Deleted Successfully");
+    },
     {
-      schema: {
+      body: ZFertilizerBulkDeleteReq,
+      detail: {
         summary: "Delete Multiple Fertilizer",
         description: "Delete multiple fertilizer by their IDs",
         tags: ["Fertilizer"],
-        body: ZFertilizerBulkDeleteReq,
-        response: {
-          209: ZFertilizerBulkDeleteRes,
-          // 400: ZResErrorCommon["400"],
-          // 404: ZResErrorCommon["404"],
-          // 500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result: DT<typeof ZFertilizerBulkDeleteRes> = await FertilizerBulkDelete(req.body);
-      return reply.success(result, 209, "Fertilizer Deleted Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
   );
-};

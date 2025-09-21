@@ -1,5 +1,7 @@
 import { ZResErrorCommon } from "@utils/zod.util";
-import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { Elysia } from "elysia";
+import { jwt } from '@elysiajs/jwt';
+import { config } from '../../config/env.config';
 import { PlantCategoryBulkDelete, plantCategoryBulkPatch, PlantCategoryDelete, PlantCategoryGet, PlantCategoryPatch, PlantCategoryPost, PlantCategoryPostBulk } from "./plant-category.controller";
 import {
   ZPlantCategoryBulkDeleteReq,
@@ -17,175 +19,131 @@ import {
   ZPlantCategoryPostReq,
   ZPlantCategoryPostRes
 } from "./plant-category.validator";
+import { successResponse } from "../../utils/response.util";
 
-
-export const plantCategoryRoute: FastifyPluginAsyncZod = async (fastify) => {
+export const plantCategoryRoute = new Elysia()
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: config.JWT_SECRET
+    })
+  )
   // GET all plant categories
-  fastify.get(
+  .get(
     "/",
+    async ({ query }) => {
+      const data: DT<typeof ZPlantCategoryGetRes> = await PlantCategoryGet(query);
+      return successResponse(data, 200, "Plant Categories Fetched Successfully");
+    },
     {
-      schema: {
+      query: ZPlantCategoryGetReq,
+      detail: {
         summary: "Get Plant Categories",
         description: "Retrieve a paginated list of plant categories",
         tags: ["Plant Categories"],
-        querystring: ZPlantCategoryGetReq,
-        response: {
-          200: ZPlantCategoryGetRes,
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const data: DT<typeof ZPlantCategoryGetRes> = await PlantCategoryGet(req.query);
-      return reply.success(data, 200, "Plant Categories Fetched Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
+  )
   // POST single plant category
-  fastify.post(
+  .post(
     "/",
+    async ({ body }) => {
+      const data: DT<typeof ZPlantCategoryPostRes> = await PlantCategoryPost(body);
+      return successResponse(data, 201, "Plant Category Created Successfully");
+    },
     {
-      schema: {
+      body: ZPlantCategoryPostReq,
+      detail: {
         summary: "Create Plant Category",
         description: "Create a new plant category",
         tags: ["Plant Categories"],
-        body: ZPlantCategoryPostReq,
-        response: {
-          201: ZPlantCategoryPostRes,
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const data: DT<typeof ZPlantCategoryPostRes> = await PlantCategoryPost(req.body);
-      return reply.success(data, 201, "Plant Category Created Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
+  )
   // PATCH single plant category
-  fastify.patch(
+  .patch(
     "/",
+    async ({ body }) => {
+      const updatedPlantCategory: DT<typeof ZPlantCategoryPatchRes> = await PlantCategoryPatch(body);
+      return successResponse(updatedPlantCategory, 200, "Plant Category Updated Successfully");
+    },
     {
-      schema: {
+      body: ZPlantCategoryPatchReq,
+      detail: {
         summary: "Update Plant Category",
         description: "Update an existing plant category by ID",
         tags: ["Plant Categories"],
-        // params: ZId,
-        body: ZPlantCategoryPatchReq,
-        response: {
-          200: ZPlantCategoryPatchRes,
-          400: ZResErrorCommon["400"],
-          404: ZResErrorCommon["404"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      // const id = req.params.id;
-      const updatedPlantCategory: DT<typeof ZPlantCategoryPatchRes> = await PlantCategoryPatch(req.body);
-      return reply.success(updatedPlantCategory, 200, "Plant Category Updated Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
-  fastify.delete(
+  )
+  // DELETE single plant category
+  .delete(
     "/:id",
+    async ({ params }) => {
+      const result = await PlantCategoryDelete(params);
+      return successResponse(result, 200, "Plant Category Deleted Successfully");
+    },
     {
-      schema: {
+      params: ZPlantCategoryDeleteReq,
+      detail: {
         summary: "Delete Plant Category",
         description: "Delete a plant category by ID",
         tags: ["Plant Categories"],
-        params: ZPlantCategoryDeleteReq,
-        response: {
-          200: ZPlantCategoryDeleteRes,
-          400: ZResErrorCommon["400"],
-          404: ZResErrorCommon["404"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result = await PlantCategoryDelete(req.params);
-      return reply.success(result, 200, "Plant Category Deleted Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
+  )
   // POST bulk plant categories
-  fastify.post(
+  .post(
     "/bulk",
+    async ({ body }) => {
+      const result: DT<typeof ZPlantCategoryPostBulkRes> = await PlantCategoryPostBulk(body);
+      return successResponse(result, 201, "Plant Categories Created Successfully");
+    },
     {
-      schema: {
+      body: ZPlantCategoryPostBulkReq,
+      detail: {
         summary: "Create Multiple Plant Categories",
         description: "Create multiple plant categories in a single request",
         tags: ["Plant Categories"],
-        body: ZPlantCategoryPostBulkReq,
-        response: {
-          201: ZPlantCategoryPostBulkRes,
-          400: ZResErrorCommon["400"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result: DT<typeof ZPlantCategoryPostBulkRes> = await PlantCategoryPostBulk(req.body);
-      return reply.success(result, 201, "Plant Categories Created Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
-
+  )
   // PATCH bulk plant categories
-  fastify.patch(
+  .patch(
     "/bulk",
+    async ({ body }) => {
+      const result = await plantCategoryBulkPatch(body);
+      return successResponse(result, 200, "Plant Categories Updated Successfully");
+    },
     {
-      schema: {
+      body: ZPlantCategoryPatchBulkReq,
+      detail: {
         summary: "Update Multiple Plant Categories",
         description: "Update multiple plant categories in a single request",
         tags: ["Plant Categories"],
-        body: ZPlantCategoryPatchBulkReq,
-        response: {
-          200: ZPlantCategoryPatchBulkRes,
-          400: ZResErrorCommon["400"],
-          404: ZResErrorCommon["404"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result = await plantCategoryBulkPatch(req.body);
-      return reply.success(result, 200, "Plant Categories Updated Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
-  );
-
-  // DELETE single plant category
-
+  )
   // DELETE bulk plant categories
-  fastify.delete(
+  .delete(
     "/bulk",
+    async ({ body }) => {
+      const result: DT<typeof ZPlantCategoryBulkDeleteRes> = await PlantCategoryBulkDelete(body);
+      return successResponse(result, 209, "Plant Categories Deleted Successfully");
+    },
     {
-      schema: {
+      body: ZPlantCategoryBulkDeleteReq,
+      detail: {
         summary: "Delete Multiple Plant Categories",
         description: "Delete multiple plant categories by their IDs",
         tags: ["Plant Categories"],
-        body: ZPlantCategoryBulkDeleteReq,
-        response: {
-          209: ZPlantCategoryBulkDeleteRes,
-          400: ZResErrorCommon["400"],
-          404: ZResErrorCommon["404"],
-          500: ZResErrorCommon["500"],
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (req, reply) => {
-      const result: DT<typeof ZPlantCategoryBulkDeleteRes> = await PlantCategoryBulkDelete(req.body);
-      return reply.success(result, 209, "Plant Categories Deleted Successfully");
+        security: [{ bearerAuth: [] }]
+      }
     }
   );
-};
