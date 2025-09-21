@@ -36,6 +36,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         summary: "Color Create",
         body: ZColorRouteCreate,
+        tags: ["Colors"],
         response: {
           201: ZResOK(ZColor),
           400: ZResErrorCommon["400"],
@@ -56,6 +57,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         params: ZId,
         summary: "Color Update",
+        tags: ["Colors"],
         body: ZColorRouteUpdate,
         response: {
           200: ZResOK(ZColor),
@@ -78,6 +80,7 @@ export const colorRoute: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         params: ZId,
+        tags: ["Colors"],
         summary: "Color Delete",
         response: {
           200: ZResOK(ZId),

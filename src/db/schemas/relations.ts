@@ -77,7 +77,7 @@ export const compatiblePotsRelations = relations(compatiblePots, ({ one }) => ({
 export const plantVariantToTagsRelations = relations(plantVariantToTags, ({ one }) => ({
 	plantVariant: one(plantVariants, {
 		fields: [plantVariantToTags.a],
-		references: [plantVariants.variantId]
+		references: [plantVariants.id]
 	}),
 	tag: one(tags, {
 		fields: [plantVariantToTags.b],
@@ -106,7 +106,7 @@ export const potVariantImageRelations = relations(potVariantImage, ({ one }) => 
 export const plantVariantImageRelations = relations(plantVariantImage, ({ one }) => ({
 	plantVariant: one(plantVariants, {
 		fields: [plantVariantImage.plantVariantId],
-		references: [plantVariants.variantId]
+		references: [plantVariants.id]
 	}),
 }));
 

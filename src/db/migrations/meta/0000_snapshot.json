@@ -1,5 +1,5 @@
 {
-  "id": "91eca902-bef6-437d-aee8-ac73238225bf",
+  "id": "99f64a3d-87ce-4907-aa74-3bf839900107",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -121,20 +121,21 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "timestamp(3)",
+          "type": "timestamp (3) with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "CURRENT_TIMESTAMP"
         },
         "updatedAt": {
           "name": "updatedAt",
-          "type": "timestamp(3)",
+          "type": "timestamp (3) with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
         },
         "deletedAt": {
           "name": "deletedAt",
-          "type": "timestamp(3)",
+          "type": "timestamp (3) with time zone",
           "primaryKey": false,
           "notNull": false
         }
@@ -850,7 +851,7 @@
         },
         "plantVariantId": {
           "name": "plantVariantId",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -913,8 +914,7 @@
               "expression": "plantVariantId",
               "isExpression": false,
               "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops"
+              "nulls": "last"
             }
           ],
           "isUnique": false,
@@ -932,7 +932,7 @@
             "plantVariantId"
           ],
           "columnsTo": [
-            "variantId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
@@ -950,7 +950,7 @@
       "columns": {
         "A": {
           "name": "A",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -988,7 +988,7 @@
             "A"
           ],
           "columnsTo": [
-            "variantId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
@@ -1025,9 +1025,9 @@
       "name": "plant_variants",
       "schema": "",
       "columns": {
-        "variantId": {
-          "name": "variantId",
-          "type": "text",
+        "id": {
+          "name": "id",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },

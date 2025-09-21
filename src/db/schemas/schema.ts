@@ -62,7 +62,7 @@ export const plants = pgTable("Plants", {
 ]);
 
 export const plantVariants = pgTable("plant_variants", {
-	variantId: text().primaryKey().notNull(),
+	id: serial("id").primaryKey().notNull(),
 	plantId: text().notNull(),
 	plantSizeId: text().notNull(),
 	colorId: uuid().notNull(),
@@ -158,23 +158,29 @@ export const potVariantImage = pgTable("PotVariantImage", {
 
 export const plantVariantImage = pgTable("PlantVariantImage", {
 	id: text().primaryKey().notNull(),
-	plantVariantId: text().notNull(),
+	plantVariantId: integer().notNull(),
 	mediaUrl: text().notNull(),
 	publicId: text().notNull(),
 	mediaType: text(),
 	resourceType: text(),
 	isPrimary: boolean().default(false).notNull(),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+	createdAt: timestamp({ precision: 3, mode: "string" })
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
+	updatedAt: timestamp({ precision: 3, mode: "string" }).notNull(),
+	deletedAt: timestamp({ precision: 3, mode: "string" }),
 }, (table) => [
-	index("PlantVariantImage_plantVariantId_idx").using("btree", table.plantVariantId.asc().nullsLast().op("text_ops")),
+	// ✅ use integer index instead of text_ops
+	index("PlantVariantImage_plantVariantId_idx").on(table.plantVariantId),
+
+	// ✅ proper foreign key reference
 	foreignKey({
 		columns: [table.plantVariantId],
-		foreignColumns: [plantVariants.variantId],
-		name: "PlantVariantImage_plantVariantId_fkey"
+		foreignColumns: [plantVariants.id],
+		name: "PlantVariantImage_plantVariantId_fkey",
 	}).onUpdate("cascade").onDelete("cascade"),
 ]);
+
 
 export const plantSizeProfile = pgTable(
 	"PlantSizeProfile",
@@ -477,13 +483,13 @@ export const compatiblePots = pgTable("_CompatiblePots", {
 ]);
 
 export const plantVariantToTags = pgTable("_PlantVariantToTags", {
-	a: text("A").notNull(),
+	a: integer("A").notNull(),
 	b: text("B").notNull(),
 }, (table) => [
 	index().using("btree", table.b.asc().nullsLast().op("text_ops")),
 	foreignKey({
 		columns: [table.a],
-		foreignColumns: [plantVariants.variantId],
+		foreignColumns: [plantVariants.id],
 		name: "_PlantVariantToTags_A_fkey"
 	}).onUpdate("cascade").onDelete("cascade"),
 	foreignKey({
