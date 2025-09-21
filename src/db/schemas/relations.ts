@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
 import { FertilizerTable } from "./fertilizers.schema";
+import { plantVariants } from "./plant-variants.schema";
 import {
 	compatiblePots,
 	humidityLevel,
@@ -9,7 +10,6 @@ import {
 	plants,
 	plantSizeProfile,
 	plantVariantImage,
-	plantVariants,
 	plantVariantToTags,
 	potCategory,
 	potMaterial,

@@ -38,7 +38,17 @@ export async function SwaggerPlugin(fastify: FastifyInstance) {
     },
   });
 
+  
   // Set Zod compilers
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
+
+  // API Reference
+  fastify.register(import('@scalar/fastify-api-reference'), {
+    routePrefix: '/reference',
+    configuration: {
+      title: 'Our API Reference',
+      url: '/docs/json',
+    },
+  });
 }

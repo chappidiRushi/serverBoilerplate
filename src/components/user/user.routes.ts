@@ -28,6 +28,25 @@ export const userRoutes: FastifyPluginAsyncZod = async (fastify) => {
     }
   );
 
+  fastify.get("/login", {
+    schema: {
+      summary: "User Login",
+      description: "Authenticate a user and return a JWT token on success.",
+      querystring: UserRouteLoginReq.describe("User login credentials"),
+      tags: ["User", "Auth"],
+      response: {
+        200: ZResOK(UserRouteLoginReply).describe("Login success response with JWT"),
+        // 400: ZResErrorCommon["400"].describe("Invalid credentials or validation error"),
+        // 500: ZResErrorCommon["500"].describe("Internal server error"),
+      },
+    },
+  }, async (req, reply) => {
+    // Assuming `req.user` is populated by an authentication middleware
+    const user = await UserLogin(req.query, reply);
+    return reply.success(user, 200, "Login Successfully");
+  });
+  // User Login
+
 
   fastify.post(
     "/login",

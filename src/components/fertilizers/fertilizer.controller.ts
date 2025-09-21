@@ -8,6 +8,8 @@ import {
   ZFertilizerBulkDeleteRes,
   ZFertilizerDeleteReq,
   ZFertilizerDeleteRes,
+  ZFertilizerGetByIDReq,
+  ZFertilizerGetByIDRes,
   ZFertilizerGetReq,
   ZFertilizerGetRes,
   ZFertilizerPatchBulkReq,
@@ -40,6 +42,23 @@ export async function FertilizerGet(params: z.infer<typeof ZFertilizerGetReq>): 
     pagination: buildPaginationMeta(Number(count), page, limit),
   };
 }
+
+export async function FertilizerGetByID(params: z.infer<typeof ZFertilizerGetByIDReq>): Promise<DT<typeof ZFertilizerGetByIDRes>> {
+  const { id } = params;
+
+  // Fetch the fertilizer by ID
+  const [fertilizer] = await db
+    .select()
+    .from(FertilizerTable)
+    .where(eq(FertilizerTable.id, Number(id)))
+    .limit(1);
+
+  if (!fertilizer) {
+    throw CE.NOT_FOUND_404(`Fertilizer with ID ${id} not found`);
+  }
+
+  return fertilizer;
+};
 
 export const FertilizerPost = async function (data: z.infer<typeof ZFertilizerPostReq>): Promise<DT<typeof ZFertilizerPostRes>> {
   const { name } = data;

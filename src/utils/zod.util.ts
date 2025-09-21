@@ -117,7 +117,7 @@ export const ZBulkReq = <T extends z.ZodType>(data: T) =>z.object({
     items: z.array(data).min(1, "At least one item is required").max(1000, "Maximum 100 items allowed at once")
   });
 
-export const ZIDNum = z.number()
+export const ZIDNum = z.coerce.number()
 export const ZIDNums = z.array(ZIDNum);
 
 export const ZIDStr = z.string()

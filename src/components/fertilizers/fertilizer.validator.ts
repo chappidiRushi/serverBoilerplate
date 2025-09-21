@@ -1,5 +1,5 @@
 import { FertilizerTable } from "@db/schemas/fertilizers.schema";
-import { ZBulkBody, ZBulkReq, ZGetReq, ZIDNum, ZIdObjStr, ZPaginationBody, ZResOK } from "@utils/zod.util";
+import { ZBulkBody, ZBulkReq, ZGetReq, ZIDNum, ZIdObjNum, ZIdObjStr, ZPaginationBody, ZResOK } from "@utils/zod.util";
 import { createSelectSchema } from "drizzle-zod";
 import z from "zod";
 
@@ -21,6 +21,7 @@ export const ZFertilizerOriginal = createSelectSchema(FertilizerTable, {
   composition: compositionRule,
   description: descriptionRule,
   caution: cautionRule,
+  isEcoFriendly: z.coerce.boolean(), // boolean
 });
 
 
@@ -55,6 +56,10 @@ export const ZFertilizerPatchRes = ZResOK(ZFertilizerAPi);
 // DELETE (single)
 export const ZFertilizerDeleteReq = ZIdObjStr;
 export const ZFertilizerDeleteRes = ZResOK(ZIdObjStr);
+
+// DELETE (single)
+export const ZFertilizerGetByIDReq = ZIdObjNum;
+export const ZFertilizerGetByIDRes = ZResOK(ZFertilizerAPi);
 
 
 // -------------------------------------

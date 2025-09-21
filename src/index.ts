@@ -17,14 +17,7 @@ const start = async () => {
     await RegisterHooks(fastify);
     await RegisterPlugins(fastify);
     await RegisterRoutes(fastify);
-    fastify.register(import('@scalar/fastify-api-reference'), {
-      routePrefix: '/reference',
-      configuration: {
-        title: 'Our API Reference',
-        url: '/docs/json',
-      },
-    })
-
+    
     const port = config.PORT;
     const host = config.HOST;
     await fastify.listen({

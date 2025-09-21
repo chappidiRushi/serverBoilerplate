@@ -1,10 +1,12 @@
 import { type FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { FertilizerBulkDelete, FertilizerBulkPatch, FertilizerDelete, FertilizerGet, FertilizerPatch, FertilizerPost, FertilizerPostBulk } from "./fertilizer.controller";
+import { FertilizerBulkDelete, FertilizerBulkPatch, FertilizerDelete, FertilizerGet, FertilizerGetByID, FertilizerPatch, FertilizerPost, FertilizerPostBulk } from "./fertilizer.controller";
 import {
   ZFertilizerBulkDeleteReq,
   ZFertilizerBulkDeleteRes,
   ZFertilizerDeleteReq,
   ZFertilizerDeleteRes,
+  ZFertilizerGetByIDReq,
+  ZFertilizerGetByIDRes,
   ZFertilizerGetReq,
   ZFertilizerGetRes,
   ZFertilizerPatchBulkReq,
@@ -41,6 +43,7 @@ export const FertilizerRoute: FastifyPluginAsyncZod = async (fastify) => {
       return reply.success(data, 200, "Fertilizer Fetched Successfully");
     }
   );
+
 
   // POST single fertilizer
   fastify.post(
@@ -185,6 +188,28 @@ export const FertilizerRoute: FastifyPluginAsyncZod = async (fastify) => {
     async (req, reply) => {
       const result: DT<typeof ZFertilizerBulkDeleteRes> = await FertilizerBulkDelete(req.body);
       return reply.success(result, 209, "Fertilizer Deleted Successfully");
+    }
+  );
+
+    fastify.get(
+    "/:id",
+    {
+      schema: {
+        summary: "Get Fertilizer",
+        description: "Retrieve a fertilizer by ID",
+        tags: ["Fertilizer"],
+        params: ZFertilizerGetByIDReq,
+        response: {
+          200: ZFertilizerGetByIDRes,
+          // 400: ZResErrorCommon["400"],
+          // 500: ZResErrorCommon["500"],
+        },
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (req, reply) => {
+      const data: DT<typeof ZFertilizerGetByIDRes> = await FertilizerGetByID(req.params);
+      return reply.success(data, 200, "Fertilizer Fetched Successfully");
     }
   );
 };
