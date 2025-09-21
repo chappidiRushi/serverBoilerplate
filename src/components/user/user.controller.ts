@@ -1,9 +1,7 @@
 import { TUserRouteCreate, TUserRouteLogin } from "components/user/user.validator";
 import { userTable } from "db/schemas/user.schema";
 import { eq } from 'drizzle-orm';
-import { FastifyReply } from "fastify/types/reply";
 import { comparePassword, hashPassword } from "../../utils/auth.util";
-
 
 export const UserCreate = async function (payload: TUserRouteCreate) {
   const { email, fullName, password } = payload
@@ -42,8 +40,7 @@ export const UserCreate = async function (payload: TUserRouteCreate) {
   return newUser;
 }
 
-export const UserLogin = async function (payload: TUserRouteLogin, reply: FastifyReply) {
-
+export const UserLogin = async function (payload: TUserRouteLogin, jwt: any) {
   const { email, password } = payload
   const [user] = await db
     .select()
@@ -55,13 +52,14 @@ export const UserLogin = async function (payload: TUserRouteLogin, reply: Fastif
   const isValidPassword = await comparePassword(password, user.password);
   if (!isValidPassword) throw CE.BAD_REQUEST_400("Invalid Password");
 
-  const JWT = {
+  const jwtPayload = {
     userId: user.userId,
     email: user.email,
-    EXPIRES_IN: "1h"
   };
-  const token = await reply.jwtSign(payload, { expiresIn: JWT.EXPIRES_IN });
+  
+  const token = await jwt.sign(jwtPayload);
   if (!token) throw CE.INTERNAL_SERVER_ERROR_500("Failed To Generate Token");
+  
   return {
     token,
     user,

@@ -1,5 +1,6 @@
-// import type { FastifyReply, FastifyRequest } from 'fastify';
-// import { Errors } from '../types/errors';
+import { Elysia } from 'elysia';
+import { jwt } from '@elysiajs/jwt';
+import { config } from '../config/env.config';
 
 export interface AuthenticatedUser {
   id: number;
@@ -8,31 +9,33 @@ export interface AuthenticatedUser {
   lastName?: string;
 }
 
+const publicRoutePatterns = [/^\/login$/, /^\/register$/, /^\/swagger(\/.*)?$/, /^\/health$/];
 
-// export const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
-//   const token = request.headers.authorization?.replace('Bearer ', '');
+export const jwtAuthMiddleware = new Elysia()
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: config.JWT_SECRET
+    })
+  )
+  .derive(async ({ jwt, request, headers }) => {
+    const url = request.url;
+    const pathname = new URL(url).pathname;
+    
+    if (publicRoutePatterns.some((pattern) => pattern.test(pathname))) {
+      return {};
+    }
 
-//   if (!token) {
-//     throw new Errors.AuthenticationError('No token provided');
-//   }
+    const authorization = headers['authorization'];
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new Error('Unauthorized');
+    }
 
-//   try {
-//     const decoded = await request.server.jwt.verify(token) as AuthenticatedUser;auth
-//     request.user = decoded;
-//   } catch (err) {
-//     throw new Errors.AuthenticationError('Invalid or expired token');
-//   }
-// };
-
-// export const optionalAuth = async (request: FastifyRequest, reply: FastifyReply) => {
-//   try {
-//     const token = request.headers.authorization?.replace('Bearer ', '');
-
-//     if (token) {
-//       const decoded = await request.server.jwt.verify(token) as AuthenticatedUser;
-//       request.user = decoded;
-//     }
-//   } catch (err) {
-//     // Optional auth - continue without user
-//   }
-// };
+    const token = authorization.substring(7);
+    try {
+      const user = await jwt.verify(token) as AuthenticatedUser;
+      return { user };
+    } catch (err) {
+      throw new Error('Unauthorized');
+    }
+  });

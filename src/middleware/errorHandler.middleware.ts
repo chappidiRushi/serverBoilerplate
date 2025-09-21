@@ -1,26 +1,13 @@
 import { TResError } from '@utils/zod.util';
-import type { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
 import { config } from '../config/env.config';
 import { logger } from '../config/logger.config';
 import { HTTP_STATUS } from '../constants/constants';
 import { HttpError } from '../utils/errors.util';
+import { generateRequestId } from '../utils/helpers.util';
 
-// type ErrorResponse = {
-//   success: false;
-//   message: string;
-//   error: {
-//     code: string | number;
-//     details?: any;
-//   };
-//   meta: {
-//     timestamp: string;
-//     requestId: string;
-//   };
-// };
-
-export const errorHandler = (error: any, request: FastifyRequest, reply: FastifyReply) => {
-  const requestId = (request as any).requestId || 'unknown';
+export const errorHandler = (error: any) => {
+  const requestId = generateRequestId();
 
   // Default values
   let statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR;
@@ -58,19 +45,13 @@ export const errorHandler = (error: any, request: FastifyRequest, reply: Fastify
     error: error.message,
     code: error.code || statusCode,
     stack: config.NODE_ENV === 'development' ? error.stack : undefined,
-    url: request.url,
-    method: request.method,
     statusCode,
-    params: request.params,
-    query: request.query,
-    body: request.body,
   });
 
   // Send response
   const errorResponse: TResError = {
-    // success: false,
     status: false,
-    message: error.message,
+    message: error.message || message,
     error: {
       code: errorCode || statusCode,
       details: config.NODE_ENV === 'development' ? details : undefined,
@@ -81,5 +62,5 @@ export const errorHandler = (error: any, request: FastifyRequest, reply: Fastify
     },
   };
 
-  return reply.status(statusCode).send(errorResponse);
+  return errorResponse;
 };

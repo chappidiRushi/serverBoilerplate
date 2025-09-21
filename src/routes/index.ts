@@ -1,26 +1,23 @@
-import { FertilizerRoute } from "@components/fertilizers/fertilizer.routes";
-import { type FastifyInstance } from "fastify";
-import { colorRoute } from "../components/color/color.routes";
-import { plantCategoryRoute } from "../components/plant-category/plant-category.routes";
+import { Elysia } from "elysia";
 import { userRoutes } from "../components/user/user.routes";
 import { config } from "../config/env.config";
-import { jwtAuthHook } from "../hooks/jwt-auth.hook"; // import the hook
+import { successResponse } from "../utils/response.util";
 
-export async function RegisterRoutes(fastify: FastifyInstance) {
-  fastify.get('/health', async (request, reply) => {
-    return reply.success(
-      {
-        status: 'OK',
-        environment: config.NODE_ENV,
-        uptime: process.uptime(),
-      },
-      200,
-      'Server is running'
-    );
+export function RegisterRoutes(app: Elysia) {
+  app.get('/health', async () => {
+    return successResponse({
+      status: 'OK',
+      environment: config.NODE_ENV,
+      uptime: process.uptime(),
+    }, 200, 'Server is running');
   });
-  // await fastify.register({ prefix: '/api/product' });
-  await fastify.register(userRoutes, { prefix: '/api/user' });
-  await fastify.register(async (instance) => { instance.addHook('preHandler', jwtAuthHook); await instance.register(colorRoute); }, { prefix: '/api/color', });
-  await fastify.register(async (instance) => { await instance.register(plantCategoryRoute); }, { prefix: '/api/plant-category', });
-  await fastify.register(async (instance) => { await instance.register(FertilizerRoute); }, { prefix: '/api/fertilizer', });
+
+  app.group('/api/user', userRoutes);
+  
+  // TODO: Convert other routes
+  // app.group('/api/color', (app) => app.use(jwtAuthMiddleware).group('', (app) => colorRoute(app)));
+  // app.group('/api/plant-category', (app) => plantCategoryRoute(app));
+  // app.group('/api/fertilizer', (app) => FertilizerRoute(app));
+  
+  return app;
 }

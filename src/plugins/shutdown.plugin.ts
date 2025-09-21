@@ -1,11 +1,11 @@
-import { type FastifyInstance } from "fastify";
+import { Elysia } from "elysia";
 import { logger } from "../config/logger.config";
 
-export function RegisterShutdown(fastify: FastifyInstance) {
+export function RegisterShutdown(app: Elysia) {
   const gracefulShutdown = async (signal: string) => {
     logger.info(`Received ${signal}, shutting down gracefully...`);
     try {
-      await fastify.close();
+      await app.stop();
       logger.info('Server closed successfully');
       process.exit(0);
     } catch (err) {

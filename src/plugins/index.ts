@@ -1,11 +1,11 @@
-import { type FastifyInstance } from "fastify";
+import { Elysia } from "elysia";
 import { SecurityPlugin } from "./security.plugin";
 import { RegisterShutdown } from "./shutdown.plugin";
-import { SwaggerPlugin } from './swagger.pulgin';
+import { SwaggerPlugin } from './swagger.plugin';
 
-
-export async function RegisterPlugins(fastify: FastifyInstance) {
-  await SecurityPlugin(fastify);
-  await SwaggerPlugin(fastify);
-  RegisterShutdown(fastify);
+export function RegisterPlugins(app: Elysia) {
+  SecurityPlugin(app);
+  SwaggerPlugin(app);
+  RegisterShutdown(app);
+  return app;
 }

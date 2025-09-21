@@ -1,21 +1,23 @@
-import compress from '@fastify/compress';
-import cors from '@fastify/cors';
-import helmet from '@fastify/helmet';
-import jwt from '@fastify/jwt';
-import rateLimit from '@fastify/rate-limit';
-import { type FastifyInstance } from 'fastify';
+import { cors } from '@elysiajs/cors';
+import { jwt } from '@elysiajs/jwt';
+import { Elysia } from 'elysia';
 import { config } from '../config/env.config';
 
+export function SecurityPlugin(app: Elysia) {
+  app.use(
+    cors({
+      origin: true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    })
+  );
 
-export async function SecurityPlugin(fastify: FastifyInstance) {
-  await fastify.register(cors, {
-    origin: (origin, cb) => cb(null, true),
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  });
+  app.use(
+    jwt({
+      name: 'jwt',
+      secret: config.JWT_SECRET
+    })
+  );
 
-  await fastify.register(helmet, { contentSecurityPolicy: false });
-  await fastify.register(compress);
-  await fastify.register(rateLimit, { max: 10000, timeWindow: '5 minutes' });
-  await fastify.register(jwt, { secret: config.JWT_SECRET });
+  return app;
 }
