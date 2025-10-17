@@ -9,7 +9,12 @@ import { errorHandler } from './middleware/errorHandler.middleware';
 import { RegisterPlugins } from './plugins';
 import { RegisterRoutes } from './routes';
 
-const fastify = Fastify({ logger: false, }).withTypeProvider<ZodTypeProvider>();
+function genReqId(){
+  return `req-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+}
+
+
+const fastify = Fastify({ logger: false, genReqId }).withTypeProvider<ZodTypeProvider>();
 fastify.setErrorHandler(errorHandler);
 
 const start = async () => {
