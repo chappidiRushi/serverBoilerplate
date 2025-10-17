@@ -6,18 +6,6 @@ import { logger } from '../config/logger.config';
 import { HTTP_STATUS } from '../constants/constants';
 import { HttpError } from '../utils/errors.util';
 
-// type ErrorResponse = {
-//   success: false;
-//   message: string;
-//   error: {
-//     code: string | number;
-//     details?: any;
-//   };
-//   meta: {
-//     timestamp: string;
-//     requestId: string;
-//   };
-// };
 
 export const errorHandler = (error: any, request: FastifyRequest, reply: FastifyReply) => {
   const requestId = (request as any).requestId || 'unknown';

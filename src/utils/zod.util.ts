@@ -1,3 +1,4 @@
+import { FastifyRequest } from 'fastify';
 import { z, ZodRawShape } from 'zod';
 
 //#region --- Meta Schemas ---
@@ -130,3 +131,50 @@ export const ZIdObjStr = z.object({
 export const ZIdObjNum = z.object({
   id: ZIDNum
 });
+
+type TOkRes = z.infer<typeof ZResOK>
+
+export function ZParseRes200(
+  data: any,
+  req: FastifyRequest
+) {
+  const body = {
+    status: true,
+    data,
+    meta: {
+      timestamp: new Date().toISOString(),
+      requestId: req.id,
+    },
+  };
+  return body;
+}
+
+export function ZParseRes201(
+  data: any,
+  req: FastifyRequest
+) {
+  const body = {
+    status: true,
+    data,
+    meta: {
+      timestamp: new Date().toISOString(),
+      requestId: req.id,
+    },
+  };
+  return body;
+}
+
+export function ZParseRes209(
+  data: any,
+  req: FastifyRequest
+) {
+  const body = {
+    status: true,
+    data,
+    meta: {
+      timestamp: new Date().toISOString(),
+      requestId: req.id,
+    },
+  };
+  return body;
+}
