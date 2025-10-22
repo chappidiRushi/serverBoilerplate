@@ -2,12 +2,12 @@ import { relations } from "drizzle-orm/relations";
 import { colorTable } from "./color.schema";
 import { FertilizerTable } from "./fertilizers.schema";
 import { plantVariants } from "./plant-variants.schema";
+import { plantTable } from "./plant.schema";
 import {
 	compatiblePots,
 	humidityLevel,
 	plantCareGuidelines,
 	plantFertilizerSchedule,
-	plants,
 	plantSizeProfile,
 	plantVariantImage,
 	plantVariantToTags,
@@ -494,7 +494,7 @@ export const tagGroupsRelations = relations(tagGroups, ({ many }) => ({
 // 	}),
 // }));
 
-export const plantsRelations = relations(plants, ({ many }) => ({
+export const plantsRelations = relations(plantTable, ({ many }) => ({
 	// notifyMeSubscriptions: many(notifyMeSubscription),
 	plantVariants: many(plantVariants),
 	// plantCartItems: many(plantCartItem),
@@ -522,9 +522,9 @@ export const plantsRelations = relations(plants, ({ many }) => ({
 
 export const plantVariantsRelations = relations(plantVariants, ({ one, many }) => ({
 	// notifyMeSubscriptions: many(notifyMeSubscription),
-	plant: one(plants, {
+	plant: one(plantTable, {
 		fields: [plantVariants.plantId],
-		references: [plants.plantId]
+		references: [plantTable.id]
 	}),
 	color: one(colorTable, {
 		fields: [plantVariants.colorId],
@@ -604,9 +604,9 @@ export const colorRelations = relations(colorTable, ({ many }) => ({
 
 export const plantSizeProfileRelations = relations(plantSizeProfile, ({ one, many }) => ({
 	plantVariants: many(plantVariants),
-	plant: one(plants, {
+	plant: one(plantTable, {
 		fields: [plantSizeProfile.plantId],
-		references: [plants.plantId]
+		references: [plantTable.id]
 	}),
 	plantCareGuidelines: many(plantCareGuidelines),
 	plantFertilizerSchedules: many(plantFertilizerSchedule),

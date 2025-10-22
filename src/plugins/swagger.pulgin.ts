@@ -45,7 +45,7 @@ export async function SwaggerPlugin(fastify: FastifyInstance) {
 
   // API Reference
   fastify.register(import('@scalar/fastify-api-reference'), {
-    routePrefix: '/reference',
+    routePrefix: '/docs/new',
     configuration: {
       title: 'Our API Reference',
       url: '/docs/json',

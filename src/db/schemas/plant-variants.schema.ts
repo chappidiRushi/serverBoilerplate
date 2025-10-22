@@ -1,7 +1,8 @@
 import { colorTable } from "@db/schemas/color.schema";
-import { plants, plantSizeProfile } from "@db/schemas/schema";
+import { plantSizeProfile } from "@db/schemas/schema";
 import { sql } from "drizzle-orm";
 import { boolean, foreignKey, numeric, pgTable, serial, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { plantTable } from "./plant.schema";
 
 
 export const plantVariants = pgTable("plant_variants", {
@@ -20,7 +21,7 @@ export const plantVariants = pgTable("plant_variants", {
 	uniqueIndex("PlantVariants_sku_key").using("btree", table.sku.asc().nullsLast().op("text_ops")),
 	foreignKey({
 		columns: [table.plantId],
-		foreignColumns: [plants.plantId],
+		foreignColumns: [plantTable.id],
 		name: "PlantVariants_plantId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({

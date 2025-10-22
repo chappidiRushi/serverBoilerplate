@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { plantVariants } from "@db/schemas/plant-variants.schema";
+import { plantTable } from "@db/schemas/plant.schema";
 import { sql } from "drizzle-orm";
 import { boolean, foreignKey, index, integer, jsonb, numeric, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { colorTable } from "./color.schema";
@@ -26,41 +27,6 @@ export const prismaMigrations = pgTable("_prisma_migrations", {
 });
 
 
-
-export const plants = pgTable("Plants", {
-	plantId: text().primaryKey().notNull(),
-	name: text().notNull(),
-	scientificName: text(),
-	description: text().notNull(),
-	isProductActive: boolean().default(true).notNull(),
-	isFeatured: boolean().notNull(),
-	plantClass: text(),
-	plantSeries: text(),
-	placeOfOrigin: text(),
-	auraType: text(),
-	biodiversityBooster: boolean(),
-	carbonAbsorber: boolean(),
-	minimumTemperature: integer(),
-	maximumTemperature: integer(),
-	soil: text(),
-	repotting: text(),
-	maintenance: text(),
-	insideBox: text().array().default(["RAY"]),
-	benefits: text().array().default(["RAY"]),
-	spiritualUseCase: text().array().default(["RAY"]),
-	bestForEmotion: text().array().default(["RAY"]),
-	bestGiftFor: text().array().default(["RAY"]),
-	funFacts: text().array().default(["RAY"]),
-	associatedDeity: text().array().default(["RAY"]),
-	godAligned: text().array().default(["RAY"]),
-	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
-	deletedAt: timestamp({ precision: 3, mode: 'string' }),
-}, (table) => [
-	index("Plants_isFeatured_idx").using("btree", table.isFeatured.asc().nullsLast().op("bool_ops")),
-	index("Plants_isProductActive_idx").using("btree", table.isProductActive.asc().nullsLast().op("bool_ops")),
-	index("Plants_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-]);
 
 export const potCategory = pgTable("PotCategory", {
 	categoryId: text().primaryKey().notNull(),
@@ -168,7 +134,7 @@ export const plantSizeProfile = pgTable(
 		]),
 		foreignKey({
 			columns: [table.plantId],
-			foreignColumns: [plants.plantId],
+			foreignColumns: [plantTable.id],
 			name: "PlantSizeProfile_plantId_fkey",
 			onUpdate: "cascade",
 			onDelete: "restrict",
