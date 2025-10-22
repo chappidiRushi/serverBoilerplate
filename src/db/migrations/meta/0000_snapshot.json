@@ -1,5 +1,5 @@
 {
-  "id": "99f64a3d-87ce-4907-aa74-3bf839900107",
+  "id": "3b7f3526-2edd-40d4-9489-10715a6cb2b5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -231,6 +231,378 @@
             }
           ],
           "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.plant_variants": {
+      "name": "plant_variants",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "plantId": {
+          "name": "plantId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plantSizeId": {
+          "name": "plantSizeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colorId": {
+          "name": "colorId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sku": {
+          "name": "sku",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isProductActive": {
+          "name": "isProductActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "mrp": {
+          "name": "mrp",
+          "type": "numeric(65, 30)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0.0'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deletedAt": {
+          "name": "deletedAt",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "PlantVariants_sku_key": {
+          "name": "PlantVariants_sku_key",
+          "columns": [
+            {
+              "expression": "sku",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "PlantVariants_plantId_fkey": {
+          "name": "PlantVariants_plantId_fkey",
+          "tableFrom": "plant_variants",
+          "tableTo": "Plants",
+          "columnsFrom": [
+            "plantId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "PlantVariants_colorId_fkey": {
+          "name": "PlantVariants_colorId_fkey",
+          "tableFrom": "plant_variants",
+          "tableTo": "color",
+          "columnsFrom": [
+            "colorId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "PlantVariants_plantSizeId_fkey": {
+          "name": "PlantVariants_plantSizeId_fkey",
+          "tableFrom": "plant_variants",
+          "tableTo": "PlantSizeProfile",
+          "columnsFrom": [
+            "plantSizeId"
+          ],
+          "columnsTo": [
+            "plantSizeId"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Plants": {
+      "name": "Plants",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scientificName": {
+          "name": "scientificName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isProductActive": {
+          "name": "isProductActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "isFeatured": {
+          "name": "isFeatured",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plantClass": {
+          "name": "plantClass",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plantSeries": {
+          "name": "plantSeries",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "placeOfOrigin": {
+          "name": "placeOfOrigin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auraType": {
+          "name": "auraType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "biodiversityBooster": {
+          "name": "biodiversityBooster",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "carbonAbsorber": {
+          "name": "carbonAbsorber",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "minimumTemperature": {
+          "name": "minimumTemperature",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maximumTemperature": {
+          "name": "maximumTemperature",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soil": {
+          "name": "soil",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "repotting": {
+          "name": "repotting",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maintenance": {
+          "name": "maintenance",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "insideBox": {
+          "name": "insideBox",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "benefits": {
+          "name": "benefits",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "spiritualUseCase": {
+          "name": "spiritualUseCase",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bestForEmotion": {
+          "name": "bestForEmotion",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bestGiftFor": {
+          "name": "bestGiftFor",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "funFacts": {
+          "name": "funFacts",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "associatedDeity": {
+          "name": "associatedDeity",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "godAligned": {
+          "name": "godAligned",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "deletedAt": {
+          "name": "deletedAt",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "Plants_isFeatured_idx": {
+          "name": "Plants_isFeatured_idx",
+          "columns": [
+            {
+              "expression": "isFeatured",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "bool_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Plants_isProductActive_idx": {
+          "name": "Plants_isProductActive_idx",
+          "columns": [
+            {
+              "expression": "isProductActive",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "bool_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Plants_name_idx": {
+          "name": "Plants_name_idx",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -794,7 +1166,7 @@
         },
         "plantId": {
           "name": "plantId",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -827,7 +1199,7 @@
             "plantId"
           ],
           "columnsTo": [
-            "plantId"
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -1016,385 +1388,6 @@
           ]
         }
       },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.plant_variants": {
-      "name": "plant_variants",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "plantId": {
-          "name": "plantId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "plantSizeId": {
-          "name": "plantSizeId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "colorId": {
-          "name": "colorId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sku": {
-          "name": "sku",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "isProductActive": {
-          "name": "isProductActive",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
-        "mrp": {
-          "name": "mrp",
-          "type": "numeric(65, 30)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'0.0'"
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "PlantVariants_sku_key": {
-          "name": "PlantVariants_sku_key",
-          "columns": [
-            {
-              "expression": "sku",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "PlantVariants_plantId_fkey": {
-          "name": "PlantVariants_plantId_fkey",
-          "tableFrom": "plant_variants",
-          "tableTo": "Plants",
-          "columnsFrom": [
-            "plantId"
-          ],
-          "columnsTo": [
-            "plantId"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        },
-        "PlantVariants_colorId_fkey": {
-          "name": "PlantVariants_colorId_fkey",
-          "tableFrom": "plant_variants",
-          "tableTo": "color",
-          "columnsFrom": [
-            "colorId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        },
-        "PlantVariants_plantSizeId_fkey": {
-          "name": "PlantVariants_plantSizeId_fkey",
-          "tableFrom": "plant_variants",
-          "tableTo": "PlantSizeProfile",
-          "columnsFrom": [
-            "plantSizeId"
-          ],
-          "columnsTo": [
-            "plantSizeId"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.Plants": {
-      "name": "Plants",
-      "schema": "",
-      "columns": {
-        "plantId": {
-          "name": "plantId",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "scientificName": {
-          "name": "scientificName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "isProductActive": {
-          "name": "isProductActive",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
-        "isFeatured": {
-          "name": "isFeatured",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "plantClass": {
-          "name": "plantClass",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "plantSeries": {
-          "name": "plantSeries",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "placeOfOrigin": {
-          "name": "placeOfOrigin",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "auraType": {
-          "name": "auraType",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "biodiversityBooster": {
-          "name": "biodiversityBooster",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "carbonAbsorber": {
-          "name": "carbonAbsorber",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "minimumTemperature": {
-          "name": "minimumTemperature",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "maximumTemperature": {
-          "name": "maximumTemperature",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "soil": {
-          "name": "soil",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "repotting": {
-          "name": "repotting",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "maintenance": {
-          "name": "maintenance",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "insideBox": {
-          "name": "insideBox",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "benefits": {
-          "name": "benefits",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "spiritualUseCase": {
-          "name": "spiritualUseCase",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "bestForEmotion": {
-          "name": "bestForEmotion",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "bestGiftFor": {
-          "name": "bestGiftFor",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "funFacts": {
-          "name": "funFacts",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "associatedDeity": {
-          "name": "associatedDeity",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "godAligned": {
-          "name": "godAligned",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{\"RAY\"}'"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "deletedAt": {
-          "name": "deletedAt",
-          "type": "timestamp(3)",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "Plants_isFeatured_idx": {
-          "name": "Plants_isFeatured_idx",
-          "columns": [
-            {
-              "expression": "isFeatured",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last",
-              "opclass": "bool_ops"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Plants_isProductActive_idx": {
-          "name": "Plants_isProductActive_idx",
-          "columns": [
-            {
-              "expression": "isProductActive",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last",
-              "opclass": "bool_ops"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "Plants_name_idx": {
-          "name": "Plants_name_idx",
-          "columns": [
-            {
-              "expression": "name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last",
-              "opclass": "text_ops"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

@@ -1,13 +1,13 @@
 import { colorTable } from "@db/schemas/color.schema";
 import { plantSizeProfile } from "@db/schemas/schema";
 import { sql } from "drizzle-orm";
-import { boolean, foreignKey, numeric, pgTable, serial, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, foreignKey, integer, numeric, pgTable, serial, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { plantTable } from "./plant.schema";
 
 
 export const plantVariants = pgTable("plant_variants", {
 	id: serial("id").primaryKey().notNull(),
-	plantId: text().notNull(),
+	plantId: integer().notNull(),
 	plantSizeId: text().notNull(),
 	colorId: uuid().notNull(),
 	sku: text().notNull(),

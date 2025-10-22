@@ -122,7 +122,7 @@ export const plantSizeProfile = pgTable(
 	"PlantSizeProfile",
 	{
 		plantSizeId: text("plantSizeId").primaryKey().notNull(),
-		plantId: text("plantId").notNull(),
+		plantId: integer("plantId").notNull(),
 		plantSize: text("plantSize").notNull(), // changed `size()` → `text()` since Drizzle has no size type
 		height: numeric("height", { precision: 65, scale: 30 }).notNull(),
 		weight: numeric("weight", { precision: 65, scale: 30 }).notNull(),
