@@ -24,7 +24,7 @@ const start = async () => {
     await RegisterRoutes(fastify);
     
     const port = config.PORT;
-    const host = config.HOST;
+    const host = "localhost";
     await fastify.listen({
       port,
       host,

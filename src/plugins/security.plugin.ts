@@ -9,7 +9,8 @@ import { config } from '../config/env.config';
 
 export async function SecurityPlugin(fastify: FastifyInstance) {
   await fastify.register(cors, {
-    origin: (origin, cb) => cb(null, true),
+    origin:"*",
+    // origin: (origin, cb) => cb(null, true),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
